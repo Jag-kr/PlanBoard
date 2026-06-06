@@ -89,7 +89,7 @@ http://localhost:5000/api/docs.json
 ## Project Structure
 
 ```
-planboard-server/
+backend/
 ├── config/
 │   ├── db.js              # Sequelize connection
 │   └── mailer.js          # Nodemailer transporter
