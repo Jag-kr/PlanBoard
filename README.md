@@ -77,7 +77,7 @@ Open `backend/.env` and set:
 |---|---|
 | `DATABASE_URL` | `postgres://<user>:<pass>@localhost:5432/planboard` |
 | `JWT_SECRET` | Any long random string |
-| `CLIENT_URL` | `http://localhost:5173` |
+| `CLIENT_URL` | `http://localhost:3000` |
 | `GMAIL_USER` | Your Gmail address *(optional — for invite emails)* |
 | `GMAIL_PASS` | Gmail App Password *(optional)* |
 
@@ -104,14 +104,14 @@ cp .env.example .env
 
 npm install
 npm run dev
-# → App running at http://localhost:5173
+# → App running at http://localhost:3000
 ```
 
 ### Local URLs
 
 | Service | URL |
 |---|---|
-| Frontend | http://localhost:5173 |
+| Frontend | http://localhost:3000 |
 | Backend API | http://localhost:5000 |
 | API Docs (Swagger) | http://localhost:5000/api/docs |
 | Health check | http://localhost:5000/health |
