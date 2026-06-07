@@ -4,6 +4,7 @@ import { getMembers } from "../api/members";
 import { getActiveWorkspace } from "../utils/workspace";
 import { PriorityBadge, StatusBadge } from "./Badge";
 import CommentBox from "./CommentBox";
+import Modal from "./Modal";
 import {
   STATUS_LIST,
   PRIORITY_LIST,
@@ -40,15 +41,6 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
       .catch(() => {});
   }, [activeWorkspace]);
 
-  // Close on Escape
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [onClose]);
-
   if (!task) return null;
 
   const change = (field) => (e) => {
@@ -81,45 +73,35 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
 
   if (!form)
     return (
-      <div className="fixed right-0 top-14 h-[calc(100vh-3.5rem)] w-1/3 bg-white shadow-xl flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
+      <Modal isOpen={true} onClose={onClose} title="Loading..." size="lg">
+        <div className="flex justify-center py-8">
+          <LoadingSpinner />
+        </div>
+      </Modal>
     );
 
   return (
-    <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
-
-      {/* Drawer */}
-      <aside className="fixed right-0 top-14 h-[calc(100vh-3.5rem)] w-full max-w-lg bg-white shadow-2xl z-50 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+    <Modal isOpen={true} onClose={onClose} size="2xl">
+      <div className="space-y-4">
+        {/* Status & Priority Bar */}
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <StatusBadge status={form.status} />
             <PriorityBadge priority={form.priority} />
           </div>
-          <div className="flex items-center gap-2">
-            {dirty && (
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 transition-colors"
-              >
-                {saving ? "Saving…" : "Save"}
-              </button>
-            )}
+          {dirty && (
             <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-xl leading-none px-1"
+              onClick={handleSave}
+              disabled={saving}
+              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 transition-colors"
             >
-              ×
+              {saving ? "Saving…" : "Save"}
             </button>
-          </div>
+          )}
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin px-5 py-4 space-y-5">
+        <div className="flex-1 overflow-y-auto space-y-5">
           {/* Title */}
           <input
             value={form.title}
@@ -229,7 +211,7 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
           {/* Comments */}
           <CommentBox taskId={task.id} workspaceId={activeWorkspace?.id} />
         </div>
-      </aside>
-    </>
+      </div>
+    </Modal>
   );
 }
