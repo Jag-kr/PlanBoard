@@ -103,10 +103,12 @@ export default function Members() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="px-4 sm:px-6 py-5 sm:py-6 max-w-4xl mx-auto">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Members</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            Members
+          </h1>
           <p className="text-gray-500 text-sm mt-0.5">
             {members.length} member{members.length !== 1 ? "s" : ""}
           </p>
@@ -133,70 +135,76 @@ export default function Members() {
             description="Invite your team to get started."
           />
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3">
-                  Member
-                </th>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3">
-                  Role
-                </th>
-                {canAdmin && <th className="px-5 py-3" />}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {members.map((m) => (
-                <tr key={m.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      <Avatar name={m.name} size="md" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {m.name}{" "}
-                          {m.userId === user?.id && (
-                            <span className="text-xs text-gray-400">(you)</span>
-                          )}
-                        </p>
-                        <p className="text-xs text-gray-500">{m.email}</p>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50">
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 sm:px-5 py-3">
+                    Member
+                  </th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 sm:px-5 py-3">
+                    Role
+                  </th>
+                  {canAdmin && <th className="px-4 sm:px-5 py-3" />}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {members.map((m) => (
+                  <tr key={m.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 sm:px-5 py-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <Avatar name={m.name} size="md" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {m.name}{" "}
+                            {m.userId === user?.id && (
+                              <span className="text-xs text-gray-400">
+                                (you)
+                              </span>
+                            )}
+                          </p>
+                          <p className="hidden sm:block text-xs text-gray-500">
+                            {m.email}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3">
-                    {canAdmin && m.userId !== user?.id ? (
-                      <select
-                        value={m.role}
-                        onChange={(e) =>
-                          handleRoleChange(m.id, m.userId, e.target.value)
-                        }
-                        className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {ROLES.map((r) => (
-                          <option key={r} value={r}>
-                            {r}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <RoleBadge role={m.role} />
-                    )}
-                  </td>
-                  {canAdmin && (
-                    <td className="px-5 py-3 text-right">
-                      {m.userId !== user?.id && (
-                        <button
-                          onClick={() => setRemoveTarget(m)}
-                          className="text-xs text-red-400 hover:text-red-600 transition-colors"
+                    </td>
+                    <td className="px-4 sm:px-5 py-3">
+                      {canAdmin && m.userId !== user?.id ? (
+                        <select
+                          value={m.role}
+                          onChange={(e) =>
+                            handleRoleChange(m.id, m.userId, e.target.value)
+                          }
+                          className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                          Remove
-                        </button>
+                          {ROLES.map((r) => (
+                            <option key={r} value={r}>
+                              {r}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <RoleBadge role={m.role} />
                       )}
                     </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    {canAdmin && (
+                      <td className="px-4 sm:px-5 py-3 text-right">
+                        {m.userId !== user?.id && (
+                          <button
+                            onClick={() => setRemoveTarget(m)}
+                            className="text-xs text-red-400 hover:text-red-600 transition-colors"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

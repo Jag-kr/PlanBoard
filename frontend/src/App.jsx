@@ -13,16 +13,18 @@ import Signup from "./pages/Signup";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
-import Board from "./pages/Board";
+import Tasks from "./pages/Tasks";
 import Members from "./pages/Members";
 import Settings from "./pages/Settings";
 
 /**
  * AppShell — fetches & caches workspaces on mount, then renders
  * the sidebar + topbar + page content layout.
+ * Also manages mobile sidebar open/close state.
  */
 function AppShell({ children }) {
   const [loading, setLoading] = useState(!getActiveWorkspace());
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     // Re-fetch workspaces to keep localStorage fresh on every mount
@@ -39,9 +41,18 @@ function AppShell({ children }) {
 
   return (
     <div className="app-shell">
-      <Sidebar />
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
       <div className="app-shell__main">
-        <Navbar />
+        <Navbar onMenuToggle={() => setSidebarOpen((v) => !v)} />
         <main className="app-shell__content">{children}</main>
       </div>
     </div>
@@ -98,7 +109,7 @@ export default function App() {
           element={
             <ProtectedRoute>
               <AppShell>
-                <Board />
+                <Tasks />
               </AppShell>
             </ProtectedRoute>
           }

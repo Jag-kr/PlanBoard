@@ -79,12 +79,22 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function Sidebar() {
-  // Read from localStorage once on mount — stable for the whole session.
+/**
+ * Sidebar component.
+ *
+ * Props:
+ *  - open     : boolean — controls mobile overlay visibility (passed from AppShell)
+ *  - onClose  : fn      — called when user closes sidebar on mobile
+ *
+ * On desktop (lg+) the sidebar is always visible and can be collapsed/expanded.
+ * On mobile (<lg) it is a fixed overlay that slides in when `open` is true.
+ */
+export default function Sidebar({ open = false, onClose }) {
   const user = getUser();
   const workspace = getActiveWorkspace();
   const userRole = workspace?.role || "MEMBER";
 
+  // Desktop collapse state (only meaningful on lg+)
   const [collapsed, setCollapsed] = useState(false);
 
   const visibleItems = NAV_ITEMS.filter(
@@ -99,9 +109,14 @@ export default function Sidebar() {
       .map((n) => n[0].toUpperCase())
       .join("");
 
+  // On mobile a nav click should close the sidebar
+  const handleNavClick = () => {
+    if (onClose) onClose();
+  };
+
   return (
     <aside
-      className={`sidebar ${collapsed ? "sidebar--collapsed" : "sidebar--expanded"}`}
+      className={`sidebar ${collapsed ? "sidebar--collapsed" : "sidebar--expanded"} ${open ? "sidebar--mobile-open" : ""}`}
       aria-label="Main navigation"
     >
       {/* Header */}
@@ -143,6 +158,7 @@ export default function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
+            onClick={handleNavClick}
             className={({ isActive }) =>
               `sidebar__link ${isActive ? "sidebar__link--active" : ""}`
             }

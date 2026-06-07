@@ -29,7 +29,7 @@ export default function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
       role="dialog"
       aria-modal="true"
     >
@@ -40,12 +40,14 @@ export default function Modal({
       />
       {/* Panel */}
       <div
-        className={`relative bg-white rounded-xl shadow-2xl w-full ${sizes[size]} z-10 overflow-hidden`}
+        className={`relative bg-white w-full sm:rounded-xl shadow-2xl ${sizes[size]} z-10 overflow-hidden flex flex-col max-h-[92vh] rounded-t-2xl sm:rounded-xl`}
       >
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+          <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-100 flex-shrink-0">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+              {title}
+            </h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors text-xl leading-none"
@@ -55,8 +57,10 @@ export default function Modal({
             </button>
           </div>
         )}
-        {/* Body */}
-        <div className="px-6 py-4">{children}</div>
+        {/* Body — scrollable on mobile */}
+        <div className="px-5 sm:px-6 py-4 overflow-y-auto flex-1">
+          {children}
+        </div>
       </div>
     </div>
   );

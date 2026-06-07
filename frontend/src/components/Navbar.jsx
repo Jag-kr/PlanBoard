@@ -9,9 +9,9 @@ import Modal from "./Modal";
 import { toastError } from "../utils/toast";
 
 /**
- * Top bar — workspace switcher + create workspace modal.
+ * Top bar — hamburger menu (mobile), workspace switcher + create workspace modal.
  */
-export default function Navbar() {
+export default function Navbar({ onMenuToggle }) {
   // Read from localStorage on mount — always fresh after reload
   const [workspaces] = useState(() => getWorkspaces());
   const [activeWorkspace] = useState(() => getActiveWorkspace());
@@ -49,6 +49,28 @@ export default function Navbar() {
   return (
     <>
       <header className="topbar">
+        {/* Hamburger — visible only on mobile */}
+        <button
+          id="sidebar-hamburger"
+          className="lg:hidden p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors flex-shrink-0"
+          onClick={onMenuToggle}
+          aria-label="Open navigation menu"
+        >
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+
         <div ref={wsRef} className="topbar__workspace">
           <button
             id="workspace-switcher"

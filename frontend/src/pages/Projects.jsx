@@ -109,11 +109,13 @@ export default function Projects() {
   if (!activeWorkspace) return null;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="px-4 sm:px-6 py-5 sm:py-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            Projects
+          </h1>
           <p className="text-gray-500 text-sm mt-0.5">
             {projects.length} project{projects.length !== 1 ? "s" : ""}
           </p>

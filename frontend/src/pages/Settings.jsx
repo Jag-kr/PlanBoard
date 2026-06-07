@@ -30,7 +30,9 @@ export default function Settings() {
     if (!name.trim() || name.trim() === activeWorkspace?.name) return;
     setSaving(true);
     try {
-      const res = await updateWorkspace(activeWorkspace.id, { name: name.trim() });
+      const res = await updateWorkspace(activeWorkspace.id, {
+        name: name.trim(),
+      });
       updateCachedWorkspace(res.data.workspace);
       toastSuccess("Workspace name updated.");
     } catch (err) {
@@ -43,9 +45,11 @@ export default function Settings() {
   if (!activeWorkspace) return null;
 
   return (
-    <div className="p-6 max-w-2xl mx-auto space-y-6">
+    <div className="px-4 sm:px-6 py-5 sm:py-6 max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+          Settings
+        </h1>
         <p className="text-gray-500 text-sm mt-0.5">
           Manage workspace settings
         </p>
