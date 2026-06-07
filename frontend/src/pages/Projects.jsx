@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useWorkspace } from "../context/WorkspaceContext";
+import { getActiveWorkspace } from "../utils/workspace";
 import {
   getProjects,
   createProject,
@@ -19,7 +19,7 @@ import { PROJECT_STATUS_LIST } from "../utils/constants";
 const STATUS_OPTIONS = PROJECT_STATUS_LIST;
 
 export default function Projects() {
-  const { activeWorkspace } = useWorkspace();
+  const activeWorkspace = getActiveWorkspace();
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);

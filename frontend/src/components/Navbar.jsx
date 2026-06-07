@@ -1,16 +1,20 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useWorkspace } from "../context/WorkspaceContext";
+import {
+  getWorkspaces,
+  getActiveWorkspace,
+  switchWorkspace,
+  createWorkspace,
+} from "../utils/workspace";
 import Modal from "./Modal";
+import { toastError } from "../utils/toast";
 
 /**
  * Top bar — workspace switcher + create workspace modal.
- * Navigation links have been moved to Sidebar.jsx.
  */
 export default function Navbar() {
-  const { workspaces, activeWorkspace, switchWorkspace, createWorkspace } =
-    useWorkspace();
-  const navigate = useNavigate();
+  // Read from localStorage on mount — always fresh after reload
+  const [workspaces] = useState(() => getWorkspaces());
+  const [activeWorkspace] = useState(() => getActiveWorkspace());
 
   const [wsDropOpen, setWsDropOpen] = useState(false);
   const [newWsModal, setNewWsModal] = useState(false);
@@ -19,7 +23,6 @@ export default function Navbar() {
 
   const wsRef = useRef(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e) => {
       if (wsRef.current && !wsRef.current.contains(e.target))
@@ -35,12 +38,10 @@ export default function Navbar() {
     setCreating(true);
     try {
       await createWorkspace(newWsName.trim());
-      setNewWsModal(false);
-      setNewWsName("");
-      navigate("/dashboard");
-    } catch {
-      // handled by interceptor
-    } finally {
+      // Full reload to apply new active workspace everywhere
+      window.location.href = "/dashboard";
+    } catch (err) {
+      toastError(err.response?.data?.error || "Failed to create workspace.");
       setCreating(false);
     }
   };
@@ -48,7 +49,6 @@ export default function Navbar() {
   return (
     <>
       <header className="topbar">
-        {/* Workspace switcher */}
         <div ref={wsRef} className="topbar__workspace">
           <button
             id="workspace-switcher"
@@ -83,9 +83,8 @@ export default function Navbar() {
                 <button
                   key={ws.id}
                   onClick={() => {
-                    switchWorkspace(ws);
-                    setWsDropOpen(false);
-                    navigate("/dashboard");
+                    if (ws.id !== activeWorkspace?.id) switchWorkspace(ws);
+                    else setWsDropOpen(false);
                   }}
                   className={`topbar__ws-item ${ws.id === activeWorkspace?.id ? "topbar__ws-item--active" : ""}`}
                 >
@@ -123,7 +122,6 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Create workspace modal */}
       <Modal
         isOpen={newWsModal}
         onClose={() => setNewWsModal(false)}

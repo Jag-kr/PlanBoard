@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "../context/AuthContext";
+import { getUser } from "../utils/auth";
 import { getComments, createComment, deleteComment } from "../api/comments";
 import Avatar from "./Avatar";
 import { timeAgo } from "../utils/helpers";
@@ -7,7 +7,7 @@ import { toastError } from "../utils/toast";
 import LoadingSpinner from "./LoadingSpinner";
 
 export default function CommentBox({ taskId }) {
-  const { user } = useAuth();
+  const user = getUser();
   const [comments, setComments] = useState([]);
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(true);

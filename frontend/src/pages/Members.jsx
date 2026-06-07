@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useWorkspace } from "../context/WorkspaceContext";
-import { useAuth } from "../context/AuthContext";
+import { getActiveWorkspace } from "../utils/workspace";
+import { getUser } from "../utils/auth";
 import {
   getMembers,
   inviteMember,
@@ -20,8 +20,8 @@ import { hasRole } from "../utils/helpers";
 const ROLES = ["ADMIN", "MANAGER", "MEMBER"];
 
 export default function Members() {
-  const { activeWorkspace } = useWorkspace();
-  const { user } = useAuth();
+  const activeWorkspace = getActiveWorkspace();
+  const user = getUser();
   const navigate = useNavigate();
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,6 +40,7 @@ export default function Members() {
     if (activeWorkspace && !hasRole(activeWorkspace.role, "MANAGER")) {
       navigate("/dashboard", { replace: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkspace?.role]);
 
   const fetchMembers = async () => {

@@ -1,42 +1,42 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { acceptInvitation } from '../api/members';
-import { toastError, toastSuccess } from '../utils/toast';
+import { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { signup } from "../utils/auth";
+import { fetchAndCacheWorkspaces } from "../utils/workspace";
+import { acceptInvitation } from "../api/members";
+import { toastError, toastSuccess } from "../utils/toast";
 
 export default function Signup() {
-  const { signup } = useAuth();
-  const navigate   = useNavigate();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const inviteToken    = searchParams.get('invite');
+  const inviteToken = searchParams.get("invite");
 
-  const [form, setForm]     = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.password.length < 8) {
-      toastError('Password must be at least 8 characters.');
+      toastError("Password must be at least 8 characters.");
       return;
     }
     setLoading(true);
     try {
       await signup(form.name, form.email, form.password);
 
-      // Auto-accept invitation if token present
       if (inviteToken) {
         try {
           const res = await acceptInvitation(inviteToken);
           toastSuccess(`Joined workspace: ${res.data.workspace?.name}`);
-          navigate('/dashboard');
+          await fetchAndCacheWorkspaces();
+          navigate("/dashboard");
         } catch {
-          navigate('/onboarding');
+          navigate("/onboarding");
         }
       } else {
-        navigate('/onboarding');
+        navigate("/onboarding");
       }
     } catch (err) {
-      toastError(err.response?.data?.error || 'Signup failed. Please try again.');
+      toastError(err.response?.data?.error || "Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -49,9 +49,7 @@ export default function Signup() {
           <div className="text-4xl mb-3">📋</div>
           <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
           {inviteToken && (
-            <p className="text-sm text-blue-600 mt-1 font-medium">
-              You've been invited to join a workspace!
-            </p>
+            <p className="text-sm text-blue-600 mt-1 font-medium">You've been invited to join a workspace!</p>
           )}
         </div>
 
@@ -91,12 +89,12 @@ export default function Signup() {
               type="submit" disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-50 text-sm mt-2"
             >
-              {loading ? 'Creating account…' : 'Create account'}
+              {loading ? "Creating account…" : "Create account"}
             </button>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link to="/login" className="text-blue-600 hover:underline font-medium">Sign in</Link>
           </p>
         </div>

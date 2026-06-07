@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getTasks, createTask, updateTask, deleteTask } from "../api/tasks";
 import { getMembers } from "../api/members";
-import { useWorkspace } from "../context/WorkspaceContext";
+import { getActiveWorkspace } from "../utils/workspace";
 import KanbanBoard from "../components/KanbanBoard";
 import TaskDrawer from "../components/TaskDrawer";
 import Modal from "../components/Modal";
@@ -13,7 +13,7 @@ import { hasRole } from "../utils/helpers";
 
 export default function Board() {
   const { id: projectId } = useParams();
-  const { activeWorkspace } = useWorkspace();
+  const activeWorkspace = getActiveWorkspace();
   const navigate = useNavigate();
 
   const canManage = hasRole(activeWorkspace?.role, "MANAGER");

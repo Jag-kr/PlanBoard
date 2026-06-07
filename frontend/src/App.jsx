@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "./context/AuthContext";
-import { useWorkspace } from "./context/WorkspaceContext";
+import { isLoggedIn } from "./utils/auth";
+import { getActiveWorkspace, fetchAndCacheWorkspaces } from "./utils/workspace";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import Navbar from "./components/Navbar";
@@ -17,10 +18,25 @@ import Members from "./pages/Members";
 import Settings from "./pages/Settings";
 
 /**
- * AppShell — sidebar on the left, topbar + content on the right.
- * The sidebar is collapsible (state lives inside Sidebar.jsx).
+ * AppShell — fetches & caches workspaces on mount, then renders
+ * the sidebar + topbar + page content layout.
  */
 function AppShell({ children }) {
+  const [loading, setLoading] = useState(!getActiveWorkspace());
+
+  useEffect(() => {
+    // Re-fetch workspaces to keep localStorage fresh on every mount
+    fetchAndCacheWorkspaces().finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
   return (
     <div className="app-shell">
       <Sidebar />
@@ -33,17 +49,8 @@ function AppShell({ children }) {
 }
 
 function RootRedirect() {
-  const { isAuthenticated } = useAuth();
-  const { activeWorkspace, loading } = useWorkspace();
-
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (loading)
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  if (!activeWorkspace) return <Navigate to="/onboarding" replace />;
+  if (!isLoggedIn()) return <Navigate to="/login" replace />;
+  if (!getActiveWorkspace()) return <Navigate to="/onboarding" replace />;
   return <Navigate to="/dashboard" replace />;
 }
 
@@ -55,7 +62,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Semi-public (auth required but no workspace needed) */}
+        {/* Auth required, no workspace needed */}
         <Route
           path="/onboarding"
           element={
@@ -121,7 +128,7 @@ export default function App() {
           }
         />
 
-        {/* Default */}
+        {/* Catch-all */}
         <Route path="/" element={<RootRedirect />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

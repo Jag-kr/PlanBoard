@@ -1,20 +1,28 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { login, isLoggedIn } from "../utils/auth";
+import { getActiveWorkspace, fetchAndCacheWorkspaces } from "../utils/workspace";
 import { toastError } from "../utils/toast";
 
 export default function Login() {
-  const { login } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+
+  // If already logged in, redirect away
+  if (isLoggedIn()) {
+    const dest = getActiveWorkspace() ? "/dashboard" : "/onboarding";
+    navigate(dest, { replace: true });
+    return null;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       await login(form.email, form.password);
-      navigate("/dashboard");
+      const { active } = await fetchAndCacheWorkspaces();
+      navigate(active ? "/dashboard" : "/onboarding");
     } catch (err) {
       toastError(
         err.response?.data?.error || "Login failed. Check your credentials.",
@@ -27,7 +35,6 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">📋</div>
           <h1 className="text-2xl font-bold text-gray-900">PlanBoard</h1>
@@ -36,7 +43,6 @@ export default function Login() {
           </p>
         </div>
 
-        {/* Card */}
         <div className="bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

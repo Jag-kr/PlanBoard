@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { updateTask } from "../api/tasks";
 import { getMembers } from "../api/members";
-import { useWorkspace } from "../context/WorkspaceContext";
+import { getActiveWorkspace } from "../utils/workspace";
 import { PriorityBadge, StatusBadge } from "./Badge";
 import CommentBox from "./CommentBox";
-import Avatar from "./Avatar";
-import { formatDate } from "../utils/helpers";
 import {
   STATUS_LIST,
   PRIORITY_LIST,
@@ -16,7 +14,7 @@ import { toastError, toastSuccess } from "../utils/toast";
 import LoadingSpinner from "./LoadingSpinner";
 
 export default function TaskDrawer({ task, onClose, onUpdated }) {
-  const { activeWorkspace } = useWorkspace();
+  const activeWorkspace = getActiveWorkspace();
   const [form, setForm] = useState(null);
   const [members, setMembers] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -87,8 +85,6 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
         <LoadingSpinner />
       </div>
     );
-
-  const assignedMember = members.find((m) => m.userId === form.assignee_id);
 
   return (
     <>

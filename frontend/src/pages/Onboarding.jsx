@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useWorkspace } from "../context/WorkspaceContext";
+import { createWorkspace } from "../utils/workspace";
 import { toastError } from "../utils/toast";
 
 export default function Onboarding() {
-  const { createWorkspace } = useWorkspace();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);

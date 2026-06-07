@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useWorkspace } from "../context/WorkspaceContext";
+import { getActiveWorkspace, updateCachedWorkspace } from "../utils/workspace";
 import { updateWorkspace } from "../api/workspaces";
 import { toastError, toastSuccess } from "../utils/toast";
 import { hasRole } from "../utils/helpers";
 
 export default function Settings() {
-  const { activeWorkspace, updateActiveWorkspace } = useWorkspace();
+  const activeWorkspace = getActiveWorkspace();
   const navigate = useNavigate();
   const isAdmin = hasRole(activeWorkspace?.role, "ADMIN");
 
@@ -30,10 +30,8 @@ export default function Settings() {
     if (!name.trim() || name.trim() === activeWorkspace?.name) return;
     setSaving(true);
     try {
-      const res = await updateWorkspace(activeWorkspace.id, {
-        name: name.trim(),
-      });
-      updateActiveWorkspace(res.data.workspace);
+      const res = await updateWorkspace(activeWorkspace.id, { name: name.trim() });
+      updateCachedWorkspace(res.data.workspace);
       toastSuccess("Workspace name updated.");
     } catch (err) {
       toastError(err.response?.data?.error || "Failed to update workspace.");

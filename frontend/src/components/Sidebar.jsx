@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useWorkspace } from "../context/WorkspaceContext";
+import { NavLink } from "react-router-dom";
+import { getUser, logout } from "../utils/auth";
+import { getActiveWorkspace } from "../utils/workspace";
 import { hasRole } from "../utils/helpers";
 
 const NAV_ITEMS = [
@@ -80,21 +80,16 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar() {
-  const { user, logout } = useAuth();
-  const { activeWorkspace } = useWorkspace();
-  const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
+  // Read from localStorage once on mount — stable for the whole session.
+  const user = getUser();
+  const workspace = getActiveWorkspace();
+  const userRole = workspace?.role || "MEMBER";
 
-  const userRole = activeWorkspace?.role || "MEMBER";
+  const [collapsed, setCollapsed] = useState(false);
 
   const visibleItems = NAV_ITEMS.filter(
     (item) => !item.minRole || hasRole(userRole, item.minRole),
   );
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
 
   const getInitials = (name = "") =>
     name
@@ -109,7 +104,7 @@ export default function Sidebar() {
       className={`sidebar ${collapsed ? "sidebar--collapsed" : "sidebar--expanded"}`}
       aria-label="Main navigation"
     >
-      {/* Header — logo + collapse toggle */}
+      {/* Header */}
       <div className="sidebar__header">
         {!collapsed && (
           <div className="sidebar__brand">
@@ -161,7 +156,6 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Spacer */}
       <div className="sidebar__spacer" />
 
       {/* User section */}
@@ -182,7 +176,7 @@ export default function Sidebar() {
         <button
           id="sidebar-logout"
           className={`sidebar__logout ${collapsed ? "sidebar__logout--icon-only" : ""}`}
-          onClick={handleLogout}
+          onClick={logout}
           title="Sign out"
           aria-label="Sign out"
         >

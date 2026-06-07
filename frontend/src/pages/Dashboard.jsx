@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useWorkspace } from "../context/WorkspaceContext";
+import { getActiveWorkspace } from "../utils/workspace";
 import { getWorkspaceStats } from "../api/workspaces";
 import { PriorityBadge, StatusBadge } from "../components/Badge";
 import Avatar from "../components/Avatar";
@@ -9,7 +9,7 @@ import { formatDate, isOverdue, timeAgo } from "../utils/helpers";
 import { toastError } from "../utils/toast";
 
 export default function Dashboard() {
-  const { activeWorkspace } = useWorkspace();
+  const activeWorkspace = getActiveWorkspace();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +28,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkspace?.id]);
 
   if (!activeWorkspace)
