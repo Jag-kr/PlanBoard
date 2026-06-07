@@ -1,8 +1,8 @@
-const express = require('express');
-const { body } = require('express-validator');
+const express = require("express");
+const { body } = require("express-validator");
 const router = express.Router();
-const auth = require('../middleware/auth');
-const commentController = require('../controllers/commentController');
+const auth = require("../middleware/auth");
+const commentController = require("../controllers/commentController");
 
 /**
  * @swagger
@@ -58,7 +58,7 @@ const commentController = require('../controllers/commentController');
  *       404:
  *         description: Task not found
  */
-router.get('/tasks/:taskId/comments', auth, commentController.getComments);
+router.get("/tasks/:taskId/comments", auth, commentController.getComments);
 
 /**
  * @swagger
@@ -95,10 +95,10 @@ router.get('/tasks/:taskId/comments', auth, commentController.getComments);
  *         description: Validation error (body is empty)
  */
 router.post(
-  '/tasks/:taskId/comments',
+  "/tasks/:taskId/comments",
   auth,
-  [body('body').trim().notEmpty().withMessage('Comment body cannot be empty.')],
-  commentController.createComment
+  [body("body").trim().notEmpty().withMessage("Comment body cannot be empty.")],
+  commentController.createComment,
 );
 
 /**
@@ -123,6 +123,6 @@ router.post(
  *       404:
  *         description: Comment not found
  */
-router.delete('/comments/:commentId', auth, commentController.deleteComment);
+router.delete("/comments/:commentId", auth, commentController.deleteComment);
 
 module.exports = router;

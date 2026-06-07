@@ -1,9 +1,9 @@
-import { PriorityBadge } from './Badge';
-import Avatar from './Avatar';
-import { formatDate, isOverdue } from '../utils/helpers';
+import { PriorityBadge } from "./Badge";
+import Avatar from "./Avatar";
+import { formatDate, isOverdue } from "../utils/helpers";
 
 export default function TaskCard({ task, onClick, onDragStart, onDragEnd }) {
-  const overdue = isOverdue(task.due_date) && task.status !== 'DONE';
+  const overdue = isOverdue(task.due_date) && task.status !== "DONE";
 
   return (
     <div
@@ -17,8 +17,11 @@ export default function TaskCard({ task, onClick, onDragStart, onDragEnd }) {
       <div className="flex items-start justify-between gap-2 mb-2">
         <PriorityBadge priority={task.priority} />
         {task.due_date && (
-          <span className={`text-xs ${overdue ? 'text-red-600 font-semibold' : 'text-gray-400'}`}>
-            {overdue ? '⚠ ' : ''}{formatDate(task.due_date)}
+          <span
+            className={`text-xs ${overdue ? "text-red-600 font-semibold" : "text-gray-400"}`}
+          >
+            {overdue ? "⚠ " : ""}
+            {formatDate(task.due_date)}
           </span>
         )}
       </div>
@@ -34,10 +37,10 @@ export default function TaskCard({ task, onClick, onDragStart, onDragEnd }) {
           <span className="text-xs text-gray-400 truncate max-w-[100px]">
             📝 Has description
           </span>
-        ) : <span />}
-        {task.assignee && (
-          <Avatar name={task.assignee.name} size="xs" />
+        ) : (
+          <span />
         )}
+        {task.assignee && <Avatar name={task.assignee.name} size="xs" />}
       </div>
     </div>
   );

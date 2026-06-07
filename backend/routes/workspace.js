@@ -1,11 +1,11 @@
-const express = require('express');
-const { body } = require('express-validator');
+const express = require("express");
+const { body } = require("express-validator");
 const router = express.Router();
-const auth = require('../middleware/auth');
-const { requireRole } = require('../middleware/rbac');
-const workspaceController = require('../controllers/workspaceController');
-const memberController = require('../controllers/memberController');
-const dashboardController = require('../controllers/dashboardController');
+const auth = require("../middleware/auth");
+const { requireRole } = require("../middleware/rbac");
+const workspaceController = require("../controllers/workspaceController");
+const memberController = require("../controllers/memberController");
+const dashboardController = require("../controllers/dashboardController");
 
 // All workspace routes require authentication
 router.use(auth);
@@ -44,9 +44,9 @@ router.use(auth);
  *         description: Validation error
  */
 router.post(
-  '/',
-  [body('name').trim().notEmpty().withMessage('Workspace name is required.')],
-  workspaceController.create
+  "/",
+  [body("name").trim().notEmpty().withMessage("Workspace name is required.")],
+  workspaceController.create,
 );
 
 /**
@@ -61,7 +61,7 @@ router.post(
  *       200:
  *         description: List of workspaces with member count and user role
  */
-router.get('/mine', workspaceController.getMine);
+router.get("/mine", workspaceController.getMine);
 
 /**
  * @swagger
@@ -95,10 +95,16 @@ router.get('/mine', workspaceController.getMine);
  *         description: Workspace not found
  */
 router.patch(
-  '/:workspaceId',
-  requireRole('ADMIN'),
-  [body('name').optional().trim().notEmpty().withMessage('Name cannot be blank.')],
-  workspaceController.update
+  "/:workspaceId",
+  requireRole("ADMIN"),
+  [
+    body("name")
+      .optional()
+      .trim()
+      .notEmpty()
+      .withMessage("Name cannot be blank."),
+  ],
+  workspaceController.update,
 );
 
 /**
@@ -119,7 +125,7 @@ router.patch(
  *       200:
  *         description: Dashboard stats object
  */
-router.get('/:workspaceId/stats', dashboardController.getStats);
+router.get("/:workspaceId/stats", dashboardController.getStats);
 
 /**
  * @swagger
@@ -139,7 +145,7 @@ router.get('/:workspaceId/stats', dashboardController.getStats);
  *       200:
  *         description: Array of members with role and user info
  */
-router.get('/:workspaceId/members', memberController.getMembers);
+router.get("/:workspaceId/members", memberController.getMembers);
 
 /**
  * @swagger
@@ -178,16 +184,19 @@ router.get('/:workspaceId/members', memberController.getMembers);
  *         description: User already a member or invite pending
  */
 router.post(
-  '/:workspaceId/invite',
-  requireRole('MANAGER'),
+  "/:workspaceId/invite",
+  requireRole("MANAGER"),
   [
-    body('email').isEmail().withMessage('Valid email is required.').normalizeEmail(),
-    body('role')
+    body("email")
+      .isEmail()
+      .withMessage("Valid email is required.")
+      .normalizeEmail(),
+    body("role")
       .optional()
-      .isIn(['ADMIN', 'MANAGER', 'MEMBER'])
-      .withMessage('Role must be ADMIN, MANAGER, or MEMBER.')
+      .isIn(["ADMIN", "MANAGER", "MEMBER"])
+      .withMessage("Role must be ADMIN, MANAGER, or MEMBER."),
   ],
-  memberController.invite
+  memberController.invite,
 );
 
 /**
@@ -230,14 +239,14 @@ router.post(
  *         description: Insufficient permissions
  */
 router.patch(
-  '/:workspaceId/members/:userId',
-  requireRole('ADMIN'),
+  "/:workspaceId/members/:userId",
+  requireRole("ADMIN"),
   [
-    body('role')
-      .isIn(['ADMIN', 'MANAGER', 'MEMBER'])
-      .withMessage('Role must be ADMIN, MANAGER, or MEMBER.')
+    body("role")
+      .isIn(["ADMIN", "MANAGER", "MEMBER"])
+      .withMessage("Role must be ADMIN, MANAGER, or MEMBER."),
   ],
-  memberController.updateRole
+  memberController.updateRole,
 );
 
 /**
@@ -267,6 +276,10 @@ router.patch(
  *       403:
  *         description: Insufficient permissions
  */
-router.delete('/:workspaceId/members/:userId', requireRole('ADMIN'), memberController.removeMember);
+router.delete(
+  "/:workspaceId/members/:userId",
+  requireRole("ADMIN"),
+  memberController.removeMember,
+);
 
 module.exports = router;

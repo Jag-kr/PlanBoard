@@ -3,8 +3,10 @@
  */
 export const formatDate = (dateStr) => {
   if (!dateStr) return null;
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric'
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 };
 
@@ -19,40 +21,51 @@ export const isOverdue = (dateStr) => {
 /**
  * Get initials from a full name (up to 2 chars).
  */
-export const getInitials = (name = '') => {
+export const getInitials = (name = "") => {
   return name
-    .split(' ')
+    .split(" ")
     .filter(Boolean)
     .slice(0, 2)
     .map((n) => n[0].toUpperCase())
-    .join('');
+    .join("");
 };
 
 /**
  * Generate a deterministic background colour for avatars based on name.
  */
 const AVATAR_COLORS = [
-  'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500',
-  'bg-indigo-500', 'bg-yellow-500', 'bg-teal-500', 'bg-orange-500',
+  "bg-blue-500",
+  "bg-green-500",
+  "bg-purple-500",
+  "bg-pink-500",
+  "bg-indigo-500",
+  "bg-yellow-500",
+  "bg-teal-500",
+  "bg-orange-500",
 ];
-export const getAvatarColor = (name = '') => {
+export const getAvatarColor = (name = "") => {
   let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < name.length; i++)
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 };
 
 /**
  * Truncate text to maxLen characters.
  */
-export const truncate = (text = '', maxLen = 80) => {
-  return text.length > maxLen ? text.slice(0, maxLen) + '…' : text;
+export const truncate = (text = "", maxLen = 80) => {
+  return text.length > maxLen ? text.slice(0, maxLen) + "…" : text;
 };
 
 /**
  * Generate a slug from a string.
  */
-export const slugify = (str = '') => {
-  return str.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+export const slugify = (str = "") => {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-");
 };
 
 /**
@@ -68,7 +81,7 @@ export const hasRole = (userRole, minRole) => {
  */
 export const timeAgo = (dateStr) => {
   const seconds = Math.floor((new Date() - new Date(dateStr)) / 1000);
-  if (seconds < 60) return 'just now';
+  if (seconds < 60) return "just now";
   const mins = Math.floor(seconds / 60);
   if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);

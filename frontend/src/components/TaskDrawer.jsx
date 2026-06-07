@@ -1,31 +1,36 @@
-import { useState, useEffect } from 'react';
-import { updateTask } from '../api/tasks';
-import { getMembers } from '../api/members';
-import { useWorkspace } from '../context/WorkspaceContext';
-import { PriorityBadge, StatusBadge } from './Badge';
-import CommentBox from './CommentBox';
-import Avatar from './Avatar';
-import { formatDate } from '../utils/helpers';
-import { STATUS_LIST, PRIORITY_LIST, STATUS_CONFIG, PRIORITY_CONFIG } from '../utils/constants';
-import { toastError, toastSuccess } from '../utils/toast';
-import LoadingSpinner from './LoadingSpinner';
+import { useState, useEffect } from "react";
+import { updateTask } from "../api/tasks";
+import { getMembers } from "../api/members";
+import { useWorkspace } from "../context/WorkspaceContext";
+import { PriorityBadge, StatusBadge } from "./Badge";
+import CommentBox from "./CommentBox";
+import Avatar from "./Avatar";
+import { formatDate } from "../utils/helpers";
+import {
+  STATUS_LIST,
+  PRIORITY_LIST,
+  STATUS_CONFIG,
+  PRIORITY_CONFIG,
+} from "../utils/constants";
+import { toastError, toastSuccess } from "../utils/toast";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function TaskDrawer({ task, onClose, onUpdated }) {
   const { activeWorkspace } = useWorkspace();
-  const [form, setForm]       = useState(null);
+  const [form, setForm] = useState(null);
   const [members, setMembers] = useState([]);
-  const [saving, setSaving]   = useState(false);
-  const [dirty, setDirty]     = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
     if (!task) return;
     setForm({
-      title:       task.title,
-      description: task.description || '',
-      status:      task.status,
-      priority:    task.priority,
-      assignee_id: task.assignee_id || '',
-      due_date:    task.due_date || '',
+      title: task.title,
+      description: task.description || "",
+      status: task.status,
+      priority: task.priority,
+      assignee_id: task.assignee_id || "",
+      due_date: task.due_date || "",
     });
     setDirty(false);
   }, [task]);
@@ -39,9 +44,11 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
 
   // Close on Escape
   useEffect(() => {
-    const handler = (e) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    const handler = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
   }, [onClose]);
 
   if (!task) return null;
@@ -56,25 +63,30 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
     setSaving(true);
     try {
       const payload = {
-        title:       form.title.trim(),
+        title: form.title.trim(),
         description: form.description,
-        status:      form.status,
-        priority:    form.priority,
+        status: form.status,
+        priority: form.priority,
         assignee_id: form.assignee_id || null,
-        due_date:    form.due_date || null,
+        due_date: form.due_date || null,
       };
       const res = await updateTask(task.id, payload);
       onUpdated && onUpdated(res.data.task);
-      toastSuccess('Task updated.');
+      toastSuccess("Task updated.");
       setDirty(false);
     } catch {
-      toastError('Failed to save task.');
+      toastError("Failed to save task.");
     } finally {
       setSaving(false);
     }
   };
 
-  if (!form) return <div className="fixed right-0 top-14 h-[calc(100vh-3.5rem)] w-1/3 bg-white shadow-xl flex items-center justify-center"><LoadingSpinner /></div>;
+  if (!form)
+    return (
+      <div className="fixed right-0 top-14 h-[calc(100vh-3.5rem)] w-1/3 bg-white shadow-xl flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
 
   const assignedMember = members.find((m) => m.userId === form.assignee_id);
 
@@ -98,10 +110,15 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
                 disabled={saving}
                 className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 transition-colors"
               >
-                {saving ? 'Saving…' : 'Save'}
+                {saving ? "Saving…" : "Save"}
               </button>
             )}
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none px-1">×</button>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-xl leading-none px-1"
+            >
+              ×
+            </button>
           </div>
         </div>
 
@@ -110,7 +127,7 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
           {/* Title */}
           <input
             value={form.title}
-            onChange={change('title')}
+            onChange={change("title")}
             className="w-full text-lg font-semibold text-gray-900 border-0 border-b border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none py-1 transition-colors"
           />
 
@@ -118,53 +135,82 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
           <div className="grid grid-cols-2 gap-3">
             {/* Status */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
-              <select value={form.status} onChange={change('status')}
-                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Status
+              </label>
+              <select
+                value={form.status}
+                onChange={change("status")}
+                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
                 {STATUS_LIST.map((s) => (
-                  <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
+                  <option key={s} value={s}>
+                    {STATUS_CONFIG[s].label}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Priority */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Priority</label>
-              <select value={form.priority} onChange={change('priority')}
-                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Priority
+              </label>
+              <select
+                value={form.priority}
+                onChange={change("priority")}
+                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
                 {PRIORITY_LIST.map((p) => (
-                  <option key={p} value={p}>{PRIORITY_CONFIG[p].label}</option>
+                  <option key={p} value={p}>
+                    {PRIORITY_CONFIG[p].label}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Assignee */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Assignee</label>
-              <select value={form.assignee_id} onChange={change('assignee_id')}
-                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Assignee
+              </label>
+              <select
+                value={form.assignee_id}
+                onChange={change("assignee_id")}
+                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
                 <option value="">Unassigned</option>
                 {members.map((m) => (
-                  <option key={m.userId} value={m.userId}>{m.name}</option>
+                  <option key={m.userId} value={m.userId}>
+                    {m.name}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Due date */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Due date</label>
-              <input type="date" value={form.due_date} onChange={change('due_date')}
-                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Due date
+              </label>
+              <input
+                type="date"
+                value={form.due_date}
+                onChange={change("due_date")}
+                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              Description
+            </label>
             <textarea
               rows={4}
               value={form.description}
-              onChange={change('description')}
+              onChange={change("description")}
               placeholder="Add a description…"
               className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -172,7 +218,14 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
 
           {/* Meta info */}
           <div className="text-xs text-gray-400 space-y-0.5">
-            {task.creator && <p>Created by <span className="font-medium text-gray-600">{task.creator.name}</span></p>}
+            {task.creator && (
+              <p>
+                Created by{" "}
+                <span className="font-medium text-gray-600">
+                  {task.creator.name}
+                </span>
+              </p>
+            )}
           </div>
 
           <hr className="border-gray-100" />

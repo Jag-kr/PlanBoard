@@ -1,8 +1,8 @@
-const express = require('express');
-const { body } = require('express-validator');
+const express = require("express");
+const { body } = require("express-validator");
 const router = express.Router();
-const auth = require('../middleware/auth');
-const taskController = require('../controllers/taskController');
+const auth = require("../middleware/auth");
+const taskController = require("../controllers/taskController");
 
 /**
  * @swagger
@@ -47,7 +47,7 @@ const taskController = require('../controllers/taskController');
  *       404:
  *         description: Project not found
  */
-router.get('/projects/:projectId/tasks', auth, taskController.getTasks);
+router.get("/projects/:projectId/tasks", auth, taskController.getTasks);
 
 /**
  * @swagger
@@ -97,10 +97,10 @@ router.get('/projects/:projectId/tasks', auth, taskController.getTasks);
  *         description: Validation error
  */
 router.post(
-  '/projects/:projectId/tasks',
+  "/projects/:projectId/tasks",
   auth,
-  [body('title').trim().notEmpty().withMessage('Task title is required.')],
-  taskController.createTask
+  [body("title").trim().notEmpty().withMessage("Task title is required.")],
+  taskController.createTask,
 );
 
 /**
@@ -147,20 +147,24 @@ router.post(
  *         description: Task not found
  */
 router.patch(
-  '/tasks/:taskId',
+  "/tasks/:taskId",
   auth,
   [
-    body('title').optional().trim().notEmpty().withMessage('Title cannot be blank.'),
-    body('status')
+    body("title")
       .optional()
-      .isIn(['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'])
-      .withMessage('Invalid status.'),
-    body('priority')
+      .trim()
+      .notEmpty()
+      .withMessage("Title cannot be blank."),
+    body("status")
       .optional()
-      .isIn(['URGENT', 'HIGH', 'MEDIUM', 'LOW'])
-      .withMessage('Invalid priority.')
+      .isIn(["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"])
+      .withMessage("Invalid status."),
+    body("priority")
+      .optional()
+      .isIn(["URGENT", "HIGH", "MEDIUM", "LOW"])
+      .withMessage("Invalid priority."),
   ],
-  taskController.updateTask
+  taskController.updateTask,
 );
 
 /**
@@ -185,6 +189,6 @@ router.patch(
  *       404:
  *         description: Task not found
  */
-router.delete('/tasks/:taskId', auth, taskController.deleteTask);
+router.delete("/tasks/:taskId", auth, taskController.deleteTask);
 
 module.exports = router;

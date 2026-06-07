@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { toastError } from '../utils/toast';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { toastError } from "../utils/toast";
 
 export default function Login() {
   const { login } = useAuth();
-  const navigate  = useNavigate();
-  const [form, setForm]     = useState({ email: '', password: '' });
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -14,9 +14,11 @@ export default function Login() {
     setLoading(true);
     try {
       await login(form.email, form.password);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
-      toastError(err.response?.data?.error || 'Login failed. Check your credentials.');
+      toastError(
+        err.response?.data?.error || "Login failed. Check your credentials.",
+      );
     } finally {
       setLoading(false);
     }
@@ -29,14 +31,21 @@ export default function Login() {
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">📋</div>
           <h1 className="text-2xl font-bold text-gray-900">PlanBoard</h1>
-          <p className="text-gray-500 text-sm mt-1">Sign in to your workspace</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Sign in to your workspace
+          </p>
         </div>
 
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Email
+              </label>
               <input
                 id="email"
                 type="email"
@@ -50,7 +59,12 @@ export default function Login() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Password
+              </label>
               <input
                 id="password"
                 type="password"
@@ -67,13 +81,16 @@ export default function Login() {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-50 text-sm mt-2"
             >
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? "Signing in…" : "Sign in"}
             </button>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-blue-600 hover:underline font-medium">
+            Don't have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-blue-600 hover:underline font-medium"
+            >
               Create one
             </Link>
           </p>

@@ -1,6 +1,6 @@
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || '';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "";
 
 let socket = null;
 
@@ -11,15 +11,15 @@ let socket = null;
 export const getSocket = () => {
   if (socket && socket.connected) return socket;
 
-  const token = localStorage.getItem('planboard_token');
+  const token = localStorage.getItem("planboard_token");
   socket = io(SOCKET_URL, {
     auth: { token },
     autoConnect: true,
-    transports: ['websocket', 'polling'],
+    transports: ["websocket", "polling"],
   });
 
-  socket.on('connect_error', (err) => {
-    console.warn('[Socket] Connection error:', err.message);
+  socket.on("connect_error", (err) => {
+    console.warn("[Socket] Connection error:", err.message);
   });
 
   return socket;
@@ -30,14 +30,14 @@ export const getSocket = () => {
  */
 export const joinWorkspace = (workspaceId) => {
   const s = getSocket();
-  s.emit('join:workspace', workspaceId);
+  s.emit("join:workspace", workspaceId);
 };
 
 /**
  * Leave a workspace room.
  */
 export const leaveWorkspace = (workspaceId) => {
-  if (socket) socket.emit('leave:workspace', workspaceId);
+  if (socket) socket.emit("leave:workspace", workspaceId);
 };
 
 /**

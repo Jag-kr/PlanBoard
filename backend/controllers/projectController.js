@@ -1,7 +1,7 @@
-const { validationResult } = require('express-validator');
-const { Op } = require('sequelize');
-const { Project, Task, WorkspaceMember, Comment } = require('../models');
-const { hasRoleLevel } = require('../middleware/rbac');
+const { validationResult } = require("express-validator");
+const { Op } = require("sequelize");
+const { Project, Task, WorkspaceMember, Comment } = require("../models");
+const { hasRoleLevel } = require("../middleware/rbac");
 
 /**
  * GET /api/workspaces/:workspaceId/projects
@@ -13,16 +13,18 @@ const getProjects = async (req, res, next) => {
 
     // Verify membership
     const member = await WorkspaceMember.findOne({
-      where: { workspace_id: workspaceId, user_id: req.user.id }
+      where: { workspace_id: workspaceId, user_id: req.user.id },
     });
     if (!member) {
-      return res.status(403).json({ error: 'You are not a member of this workspace.' });
+      return res
+        .status(403)
+        .json({ error: "You are not a member of this workspace." });
     }
 
     const projects = await Project.findAll({
       where: { workspace_id: workspaceId },
-      include: [{ model: Task, attributes: ['id'] }],
-      order: [['created_at', 'DESC']]
+      include: [{ model: Task, attributes: ["id"] }],
+      order: [["created_at", "DESC"]],
     });
 
     const result = projects.map((p) => {
@@ -56,7 +58,7 @@ const createProject = async (req, res, next) => {
       workspace_id: workspaceId,
       name: name.trim(),
       description: description || null,
-      created_by: req.user.id
+      created_by: req.user.id,
     });
 
     return res.status(201).json({ project });
@@ -79,15 +81,17 @@ const updateProject = async (req, res, next) => {
     const { projectId } = req.params;
     const project = await Project.findByPk(projectId);
     if (!project) {
-      return res.status(404).json({ error: 'Project not found.' });
+      return res.status(404).json({ error: "Project not found." });
     }
 
     // Check role in owning workspace
     const member = await WorkspaceMember.findOne({
-      where: { workspace_id: project.workspace_id, user_id: req.user.id }
+      where: { workspace_id: project.workspace_id, user_id: req.user.id },
     });
-    if (!member || !hasRoleLevel(member.role, 'MANAGER')) {
-      return res.status(403).json({ error: 'Insufficient permissions. Requires MANAGER or higher.' });
+    if (!member || !hasRoleLevel(member.role, "MANAGER")) {
+      return res.status(403).json({
+        error: "Insufficient permissions. Requires MANAGER or higher.",
+      });
     }
 
     const { name, description, status } = req.body;
@@ -111,19 +115,24 @@ const deleteProject = async (req, res, next) => {
     const { projectId } = req.params;
     const project = await Project.findByPk(projectId);
     if (!project) {
-      return res.status(404).json({ error: 'Project not found.' });
+      return res.status(404).json({ error: "Project not found." });
     }
 
     // Check role in owning workspace
     const member = await WorkspaceMember.findOne({
-      where: { workspace_id: project.workspace_id, user_id: req.user.id }
+      where: { workspace_id: project.workspace_id, user_id: req.user.id },
     });
-    if (!member || !hasRoleLevel(member.role, 'MANAGER')) {
-      return res.status(403).json({ error: 'Insufficient permissions. Requires MANAGER or higher.' });
+    if (!member || !hasRoleLevel(member.role, "MANAGER")) {
+      return res.status(403).json({
+        error: "Insufficient permissions. Requires MANAGER or higher.",
+      });
     }
 
     // Cascade: delete comments, then tasks, then project
-    const tasks = await Task.findAll({ where: { project_id: projectId }, attributes: ['id'] });
+    const tasks = await Task.findAll({
+      where: { project_id: projectId },
+      attributes: ["id"],
+    });
     const taskIds = tasks.map((t) => t.id);
 
     if (taskIds.length > 0) {
@@ -132,7 +141,7 @@ const deleteProject = async (req, res, next) => {
     }
 
     await project.destroy();
-    return res.status(200).json({ message: 'Project deleted successfully.' });
+    return res.status(200).json({ message: "Project deleted successfully." });
   } catch (err) {
     next(err);
   }

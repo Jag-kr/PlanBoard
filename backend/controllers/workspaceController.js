@@ -1,6 +1,13 @@
-const { validationResult } = require('express-validator');
-const { Op } = require('sequelize');
-const { Workspace, WorkspaceMember, Project, Task, User, sequelize } = require('../models');
+const { validationResult } = require("express-validator");
+const { Op } = require("sequelize");
+const {
+  Workspace,
+  WorkspaceMember,
+  Project,
+  Task,
+  User,
+  sequelize,
+} = require("../models");
 
 /**
  * Generate a URL-friendly slug from a workspace name.
@@ -13,9 +20,9 @@ const generateSlug = async (name) => {
   const base = name
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
     .slice(0, 50);
 
   const exists = await Workspace.findOne({ where: { slug: base } });
@@ -43,14 +50,14 @@ const create = async (req, res, next) => {
     const workspace = await Workspace.create({
       name: name.trim(),
       slug,
-      owner_id: req.user.id
+      owner_id: req.user.id,
     });
 
     // Add creator as ADMIN
     await WorkspaceMember.create({
       workspace_id: workspace.id,
       user_id: req.user.id,
-      role: 'ADMIN'
+      role: "ADMIN",
     });
 
     return res.status(201).json({ workspace });
@@ -73,16 +80,18 @@ const getMine = async (req, res, next) => {
           include: [
             {
               model: WorkspaceMember,
-              attributes: ['id']
-            }
-          ]
-        }
-      ]
+              attributes: ["id"],
+            },
+          ],
+        },
+      ],
     });
 
     const workspaces = memberships.map((m) => {
       const ws = m.Workspace.toJSON();
-      ws.memberCount = m.Workspace.WorkspaceMembers ? m.Workspace.WorkspaceMembers.length : 0;
+      ws.memberCount = m.Workspace.WorkspaceMembers
+        ? m.Workspace.WorkspaceMembers.length
+        : 0;
       ws.role = m.role;
       delete ws.WorkspaceMembers;
       return ws;
@@ -108,7 +117,7 @@ const update = async (req, res, next) => {
     const { workspaceId } = req.params;
     const workspace = await Workspace.findByPk(workspaceId);
     if (!workspace) {
-      return res.status(404).json({ error: 'Workspace not found.' });
+      return res.status(404).json({ error: "Workspace not found." });
     }
 
     const { name } = req.body;
@@ -134,47 +143,53 @@ const getStats = async (req, res, next) => {
 
     // Verify membership
     const member = await WorkspaceMember.findOne({
-      where: { workspace_id: workspaceId, user_id: req.user.id }
+      where: { workspace_id: workspaceId, user_id: req.user.id },
     });
     if (!member) {
-      return res.status(403).json({ error: 'You are not a member of this workspace.' });
+      return res
+        .status(403)
+        .json({ error: "You are not a member of this workspace." });
     }
 
     // Get all project IDs in this workspace
     const projects = await Project.findAll({
       where: { workspace_id: workspaceId },
-      attributes: ['id']
+      attributes: ["id"],
     });
     const projectIds = projects.map((p) => p.id);
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
 
-    const [totalProjects, openTasks, overdueTasks, completedTasks] = await Promise.all([
-      Project.count({ where: { workspace_id: workspaceId } }),
-      Task.count({
-        where: { project_id: { [Op.in]: projectIds }, status: { [Op.ne]: 'DONE' } }
-      }),
-      Task.count({
-        where: {
-          project_id: { [Op.in]: projectIds },
-          due_date: { [Op.lt]: today },
-          status: { [Op.ne]: 'DONE' }
-        }
-      }),
-      Task.count({
-        where: { project_id: { [Op.in]: projectIds }, status: 'DONE' }
-      })
-    ]);
+    const [totalProjects, openTasks, overdueTasks, completedTasks] =
+      await Promise.all([
+        Project.count({ where: { workspace_id: workspaceId } }),
+        Task.count({
+          where: {
+            project_id: { [Op.in]: projectIds },
+            status: { [Op.ne]: "DONE" },
+          },
+        }),
+        Task.count({
+          where: {
+            project_id: { [Op.in]: projectIds },
+            due_date: { [Op.lt]: today },
+            status: { [Op.ne]: "DONE" },
+          },
+        }),
+        Task.count({
+          where: { project_id: { [Op.in]: projectIds }, status: "DONE" },
+        }),
+      ]);
 
     // Recent activity: last 10 updated tasks with project name
     const recentActivity = await Task.findAll({
       where: { project_id: { [Op.in]: projectIds } },
       include: [
-        { model: Project, attributes: ['id', 'name'] },
-        { model: User, as: 'assignee', attributes: ['id', 'name', 'email'] }
+        { model: Project, attributes: ["id", "name"] },
+        { model: User, as: "assignee", attributes: ["id", "name", "email"] },
       ],
-      order: [['updated_at', 'DESC']],
-      limit: 10
+      order: [["updated_at", "DESC"]],
+      limit: 10,
     });
 
     return res.status(200).json({
@@ -182,7 +197,7 @@ const getStats = async (req, res, next) => {
       openTasks,
       overdueTasks,
       completedTasks,
-      recentActivity
+      recentActivity,
     });
   } catch (err) {
     next(err);

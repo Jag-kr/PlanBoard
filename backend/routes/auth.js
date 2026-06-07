@@ -1,7 +1,7 @@
-const express = require('express');
-const { body } = require('express-validator');
+const express = require("express");
+const { body } = require("express-validator");
 const router = express.Router();
-const authController = require('../controllers/authController');
+const authController = require("../controllers/authController");
 
 /**
  * @swagger
@@ -63,15 +63,18 @@ const authController = require('../controllers/authController');
  *         description: Validation errors
  */
 router.post(
-  '/signup',
+  "/signup",
   [
-    body('name').trim().notEmpty().withMessage('Name is required.'),
-    body('email').isEmail().withMessage('Valid email is required.').normalizeEmail(),
-    body('password')
+    body("name").trim().notEmpty().withMessage("Name is required."),
+    body("email")
+      .isEmail()
+      .withMessage("Valid email is required.")
+      .normalizeEmail(),
+    body("password")
       .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters.')
+      .withMessage("Password must be at least 8 characters."),
   ],
-  authController.signup
+  authController.signup,
 );
 
 /**
@@ -122,12 +125,15 @@ router.post(
  *         description: Validation errors
  */
 router.post(
-  '/login',
+  "/login",
   [
-    body('email').isEmail().withMessage('Valid email is required.').normalizeEmail(),
-    body('password').notEmpty().withMessage('Password is required.')
+    body("email")
+      .isEmail()
+      .withMessage("Valid email is required.")
+      .normalizeEmail(),
+    body("password").notEmpty().withMessage("Password is required."),
   ],
-  authController.login
+  authController.login,
 );
 
 module.exports = router;

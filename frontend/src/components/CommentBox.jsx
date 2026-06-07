@@ -1,18 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { getComments, createComment, deleteComment } from '../api/comments';
-import { getSocket } from '../utils/socket';
-import Avatar from './Avatar';
-import { timeAgo } from '../utils/helpers';
-import { toastError } from '../utils/toast';
-import LoadingSpinner from './LoadingSpinner';
+import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "../context/AuthContext";
+import { getComments, createComment, deleteComment } from "../api/comments";
+import { getSocket } from "../utils/socket";
+import Avatar from "./Avatar";
+import { timeAgo } from "../utils/helpers";
+import { toastError } from "../utils/toast";
+import LoadingSpinner from "./LoadingSpinner";
 
-export default function CommentBox({ taskId, workspaceId }) {
+export default function CommentBox({ taskId }) {
   const { user } = useAuth();
   const [comments, setComments] = useState([]);
-  const [body, setBody]         = useState('');
-  const [loading, setLoading]   = useState(true);
-  const [posting, setPosting]   = useState(false);
+  const [body, setBody] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [posting, setPosting] = useState(false);
 
   const fetchComments = useCallback(async () => {
     if (!taskId) return;
@@ -20,7 +20,7 @@ export default function CommentBox({ taskId, workspaceId }) {
       const res = await getComments(taskId);
       setComments(res.data.comments || []);
     } catch {
-      toastError('Failed to load comments.');
+      toastError("Failed to load comments.");
     } finally {
       setLoading(false);
     }
@@ -42,8 +42,8 @@ export default function CommentBox({ taskId, workspaceId }) {
         });
       }
     };
-    socket.on('comment:added', handler);
-    return () => socket.off('comment:added', handler);
+    socket.on("comment:added", handler);
+    return () => socket.off("comment:added", handler);
   }, [taskId]);
 
   const handleSubmit = async (e) => {
@@ -52,11 +52,11 @@ export default function CommentBox({ taskId, workspaceId }) {
     setPosting(true);
     try {
       await createComment(taskId, { body: body.trim() });
-      setBody('');
+      setBody("");
       // Comment will arrive via socket; also refresh in case socket missed it
       setTimeout(fetchComments, 300);
     } catch {
-      toastError('Failed to post comment.');
+      toastError("Failed to post comment.");
     } finally {
       setPosting(false);
     }
@@ -67,7 +67,7 @@ export default function CommentBox({ taskId, workspaceId }) {
       await deleteComment(commentId);
       setComments((prev) => prev.filter((c) => c.id !== commentId));
     } catch {
-      toastError('Failed to delete comment.');
+      toastError("Failed to delete comment.");
     }
   };
 
@@ -75,20 +75,28 @@ export default function CommentBox({ taskId, workspaceId }) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-semibold text-gray-700">Comments ({comments.length})</h3>
+      <h3 className="text-sm font-semibold text-gray-700">
+        Comments ({comments.length})
+      </h3>
 
       {/* Comment list */}
       <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-thin pr-1">
         {comments.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-4">No comments yet. Be the first!</p>
+          <p className="text-sm text-gray-400 text-center py-4">
+            No comments yet. Be the first!
+          </p>
         )}
         {comments.map((c) => (
           <div key={c.id} className="flex gap-2.5 group">
             <Avatar name={c.User?.name} size="sm" />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-gray-800">{c.User?.name}</span>
-                <span className="text-xs text-gray-400">{timeAgo(c.createdAt)}</span>
+                <span className="text-xs font-semibold text-gray-800">
+                  {c.User?.name}
+                </span>
+                <span className="text-xs text-gray-400">
+                  {timeAgo(c.createdAt)}
+                </span>
                 {c.user_id === user?.id && (
                   <button
                     onClick={() => handleDelete(c.id)}
@@ -98,7 +106,9 @@ export default function CommentBox({ taskId, workspaceId }) {
                   </button>
                 )}
               </div>
-              <p className="text-sm text-gray-700 mt-0.5 break-words">{c.body}</p>
+              <p className="text-sm text-gray-700 mt-0.5 break-words">
+                {c.body}
+              </p>
             </div>
           </div>
         ))}
@@ -112,7 +122,10 @@ export default function CommentBox({ taskId, workspaceId }) {
             rows={2}
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSubmit(e); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.metaKey || e.ctrlKey))
+                handleSubmit(e);
+            }}
             placeholder="Write a comment… (Ctrl+Enter to submit)"
             className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -122,7 +135,7 @@ export default function CommentBox({ taskId, workspaceId }) {
               disabled={posting || !body.trim()}
               className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 transition-colors"
             >
-              {posting ? 'Posting…' : 'Comment'}
+              {posting ? "Posting…" : "Comment"}
             </button>
           </div>
         </div>

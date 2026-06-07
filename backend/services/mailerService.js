@@ -1,5 +1,5 @@
-const transporter = require('../config/mailer');
-require('dotenv').config();
+const transporter = require("../config/mailer");
+require("dotenv").config();
 
 /**
  * Sends a workspace invitation email.
@@ -10,9 +10,12 @@ require('dotenv').config();
  * @param {string} inviterName  - Name of the person sending the invite
  */
 const sendInvitationEmail = async (to, token, workspaceName, inviterName) => {
-  if (!process.env.GMAIL_USER || process.env.GMAIL_USER === 'your_gmail@gmail.com') {
+  if (
+    !process.env.GMAIL_USER ||
+    process.env.GMAIL_USER === "your_gmail@gmail.com"
+  ) {
     console.warn(
-      `[MailerService] GMAIL_USER not configured — skipping invitation email to ${to}.`
+      `[MailerService] GMAIL_USER not configured — skipping invitation email to ${to}.`,
     );
     return;
   }
@@ -75,11 +78,14 @@ const sendInvitationEmail = async (to, token, workspaceName, inviterName) => {
       from: `"PlanBoard" <${process.env.GMAIL_USER}>`,
       to,
       subject: `${inviterName} invited you to join "${workspaceName}" on PlanBoard`,
-      html
+      html,
     });
     console.log(`[MailerService] Invitation email sent to ${to}`);
   } catch (err) {
-    console.error(`[MailerService] Failed to send email to ${to}:`, err.message);
+    console.error(
+      `[MailerService] Failed to send email to ${to}:`,
+      err.message,
+    );
     // Do not re-throw — email failure should not break the invitation flow
   }
 };

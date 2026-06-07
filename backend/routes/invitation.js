@@ -1,7 +1,7 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const auth = require('../middleware/auth');
-const memberController = require('../controllers/memberController');
+const auth = require("../middleware/auth");
+const memberController = require("../controllers/memberController");
 
 /**
  * @swagger
@@ -49,6 +49,6 @@ const memberController = require('../controllers/memberController');
  *       404:
  *         description: Invitation not found
  */
-router.post('/:token/accept', auth, memberController.acceptInvitation);
+router.post("/:token/accept", auth, memberController.acceptInvitation);
 
 module.exports = router;

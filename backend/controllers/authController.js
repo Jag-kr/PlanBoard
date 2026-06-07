@@ -1,8 +1,8 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { validationResult } = require('express-validator');
-const { User } = require('../models');
-require('dotenv').config();
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
+const { User } = require("../models");
+require("dotenv").config();
 
 /**
  * Generate a signed JWT for a user.
@@ -13,7 +13,7 @@ const generateToken = (user) => {
   return jwt.sign(
     { id: user.id, email: user.email, name: user.name },
     process.env.JWT_SECRET,
-    { expiresIn: '7d' }
+    { expiresIn: "7d" },
   );
 };
 
@@ -31,9 +31,13 @@ const signup = async (req, res, next) => {
     const { name, email, password } = req.body;
 
     // Check for existing email
-    const existing = await User.findOne({ where: { email: email.toLowerCase().trim() } });
+    const existing = await User.findOne({
+      where: { email: email.toLowerCase().trim() },
+    });
     if (existing) {
-      return res.status(409).json({ error: 'An account with that email already exists.' });
+      return res
+        .status(409)
+        .json({ error: "An account with that email already exists." });
     }
 
     // Hash password
@@ -43,14 +47,14 @@ const signup = async (req, res, next) => {
     const user = await User.create({
       name: name.trim(),
       email: email.toLowerCase().trim(),
-      password_hash
+      password_hash,
     });
 
     const token = generateToken(user);
 
     return res.status(201).json({
       token,
-      user: { id: user.id, name: user.name, email: user.email }
+      user: { id: user.id, name: user.name, email: user.email },
     });
   } catch (err) {
     next(err);
@@ -70,21 +74,23 @@ const login = async (req, res, next) => {
 
     const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { email: email.toLowerCase().trim() } });
+    const user = await User.findOne({
+      where: { email: email.toLowerCase().trim() },
+    });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      return res.status(401).json({ error: "Invalid email or password." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      return res.status(401).json({ error: "Invalid email or password." });
     }
 
     const token = generateToken(user);
 
     return res.status(200).json({
       token,
-      user: { id: user.id, name: user.name, email: user.email }
+      user: { id: user.id, name: user.name, email: user.email },
     });
   } catch (err) {
     next(err);

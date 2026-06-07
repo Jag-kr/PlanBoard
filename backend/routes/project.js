@@ -1,9 +1,9 @@
-const express = require('express');
-const { body } = require('express-validator');
+const express = require("express");
+const { body } = require("express-validator");
 const router = express.Router();
-const auth = require('../middleware/auth');
-const { requireRole } = require('../middleware/rbac');
-const projectController = require('../controllers/projectController');
+const auth = require("../middleware/auth");
+const { requireRole } = require("../middleware/rbac");
+const projectController = require("../controllers/projectController");
 
 /**
  * @swagger
@@ -32,7 +32,11 @@ const projectController = require('../controllers/projectController');
  *       403:
  *         description: Not a workspace member
  */
-router.get('/workspaces/:workspaceId/projects', auth, projectController.getProjects);
+router.get(
+  "/workspaces/:workspaceId/projects",
+  auth,
+  projectController.getProjects,
+);
 
 /**
  * @swagger
@@ -71,11 +75,11 @@ router.get('/workspaces/:workspaceId/projects', auth, projectController.getProje
  *         description: Validation error
  */
 router.post(
-  '/workspaces/:workspaceId/projects',
+  "/workspaces/:workspaceId/projects",
   auth,
-  requireRole('MANAGER'),
-  [body('name').trim().notEmpty().withMessage('Project name is required.')],
-  projectController.createProject
+  requireRole("MANAGER"),
+  [body("name").trim().notEmpty().withMessage("Project name is required.")],
+  projectController.createProject,
 );
 
 /**
@@ -114,13 +118,20 @@ router.post(
  *         description: Project not found
  */
 router.patch(
-  '/projects/:projectId',
+  "/projects/:projectId",
   auth,
   [
-    body('name').optional().trim().notEmpty().withMessage('Name cannot be blank.'),
-    body('status').optional().isIn(['ACTIVE', 'ARCHIVED']).withMessage('Invalid status.')
+    body("name")
+      .optional()
+      .trim()
+      .notEmpty()
+      .withMessage("Name cannot be blank."),
+    body("status")
+      .optional()
+      .isIn(["ACTIVE", "ARCHIVED"])
+      .withMessage("Invalid status."),
   ],
-  projectController.updateProject
+  projectController.updateProject,
 );
 
 /**
@@ -145,6 +156,6 @@ router.patch(
  *       404:
  *         description: Project not found
  */
-router.delete('/projects/:projectId', auth, projectController.deleteProject);
+router.delete("/projects/:projectId", auth, projectController.deleteProject);
 
 module.exports = router;

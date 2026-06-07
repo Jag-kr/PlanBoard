@@ -1,7 +1,7 @@
-const { validationResult } = require('express-validator');
-const { Comment, Task, Project, WorkspaceMember, User } = require('../models');
-const { hasRoleLevel } = require('../middleware/rbac');
-const { emitToWorkspace } = require('../sockets/emitter');
+const { validationResult } = require("express-validator");
+const { Comment, Task, Project, WorkspaceMember, User } = require("../models");
+const { hasRoleLevel } = require("../middleware/rbac");
+const { emitToWorkspace } = require("../sockets/emitter");
 
 /**
  * GET /api/tasks/:taskId/comments
@@ -12,19 +12,22 @@ const getComments = async (req, res, next) => {
     const { taskId } = req.params;
 
     const task = await Task.findByPk(taskId, {
-      include: [{ model: Project, attributes: ['workspace_id'] }]
+      include: [{ model: Project, attributes: ["workspace_id"] }],
     });
-    if (!task) return res.status(404).json({ error: 'Task not found.' });
+    if (!task) return res.status(404).json({ error: "Task not found." });
 
     const member = await WorkspaceMember.findOne({
-      where: { workspace_id: task.Project.workspace_id, user_id: req.user.id }
+      where: { workspace_id: task.Project.workspace_id, user_id: req.user.id },
     });
-    if (!member) return res.status(403).json({ error: 'You are not a member of this workspace.' });
+    if (!member)
+      return res
+        .status(403)
+        .json({ error: "You are not a member of this workspace." });
 
     const comments = await Comment.findAll({
       where: { task_id: taskId },
-      include: [{ model: User, attributes: ['id', 'name', 'email'] }],
-      order: [['created_at', 'ASC']]
+      include: [{ model: User, attributes: ["id", "name", "email"] }],
+      order: [["created_at", "ASC"]],
     });
 
     return res.status(200).json({ comments });
@@ -48,27 +51,34 @@ const createComment = async (req, res, next) => {
     const { body } = req.body;
 
     const task = await Task.findByPk(taskId, {
-      include: [{ model: Project, attributes: ['workspace_id'] }]
+      include: [{ model: Project, attributes: ["workspace_id"] }],
     });
-    if (!task) return res.status(404).json({ error: 'Task not found.' });
+    if (!task) return res.status(404).json({ error: "Task not found." });
 
     const workspaceId = task.Project.workspace_id;
     const member = await WorkspaceMember.findOne({
-      where: { workspace_id: workspaceId, user_id: req.user.id }
+      where: { workspace_id: workspaceId, user_id: req.user.id },
     });
-    if (!member) return res.status(403).json({ error: 'You are not a member of this workspace.' });
+    if (!member)
+      return res
+        .status(403)
+        .json({ error: "You are not a member of this workspace." });
 
     const comment = await Comment.create({
       task_id: taskId,
       user_id: req.user.id,
-      body: body.trim()
+      body: body.trim(),
     });
 
     const fullComment = await Comment.findByPk(comment.id, {
-      include: [{ model: User, attributes: ['id', 'name', 'email'] }]
+      include: [{ model: User, attributes: ["id", "name", "email"] }],
     });
 
-    emitToWorkspace(workspaceId, 'comment:added', { comment: fullComment, taskId, workspaceId });
+    emitToWorkspace(workspaceId, "comment:added", {
+      comment: fullComment,
+      taskId,
+      workspaceId,
+    });
 
     return res.status(201).json({ comment: fullComment });
   } catch (err) {
@@ -88,27 +98,32 @@ const deleteComment = async (req, res, next) => {
       include: [
         {
           model: Task,
-          include: [{ model: Project, attributes: ['workspace_id'] }]
-        }
-      ]
+          include: [{ model: Project, attributes: ["workspace_id"] }],
+        },
+      ],
     });
-    if (!comment) return res.status(404).json({ error: 'Comment not found.' });
+    if (!comment) return res.status(404).json({ error: "Comment not found." });
 
     const workspaceId = comment.Task.Project.workspace_id;
     const member = await WorkspaceMember.findOne({
-      where: { workspace_id: workspaceId, user_id: req.user.id }
+      where: { workspace_id: workspaceId, user_id: req.user.id },
     });
-    if (!member) return res.status(403).json({ error: 'You are not a member of this workspace.' });
+    if (!member)
+      return res
+        .status(403)
+        .json({ error: "You are not a member of this workspace." });
 
-    const isPrivileged = hasRoleLevel(member.role, 'MANAGER');
+    const isPrivileged = hasRoleLevel(member.role, "MANAGER");
     const isAuthor = comment.user_id === req.user.id;
 
     if (!isPrivileged && !isAuthor) {
-      return res.status(403).json({ error: 'You can only delete your own comments.' });
+      return res
+        .status(403)
+        .json({ error: "You can only delete your own comments." });
     }
 
     await comment.destroy();
-    return res.status(200).json({ message: 'Comment deleted successfully.' });
+    return res.status(200).json({ message: "Comment deleted successfully." });
   } catch (err) {
     next(err);
   }

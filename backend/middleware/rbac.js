@@ -1,4 +1,4 @@
-const { WorkspaceMember } = require('../models');
+const { WorkspaceMember } = require("../models");
 
 /**
  * Role hierarchy: ADMIN > MANAGER > MEMBER
@@ -6,7 +6,7 @@ const { WorkspaceMember } = require('../models');
 const ROLE_HIERARCHY = {
   ADMIN: 3,
   MANAGER: 2,
-  MEMBER: 1
+  MEMBER: 1,
 };
 
 /**
@@ -20,15 +20,17 @@ const attachWorkspaceRole = async (req, res, next) => {
   try {
     const workspaceId = req.params.workspaceId;
     if (!workspaceId) {
-      return res.status(400).json({ error: 'workspaceId param is required.' });
+      return res.status(400).json({ error: "workspaceId param is required." });
     }
 
     const member = await WorkspaceMember.findOne({
-      where: { workspace_id: workspaceId, user_id: req.user.id }
+      where: { workspace_id: workspaceId, user_id: req.user.id },
     });
 
     if (!member) {
-      return res.status(403).json({ error: 'You are not a member of this workspace.' });
+      return res
+        .status(403)
+        .json({ error: "You are not a member of this workspace." });
     }
 
     req.memberRole = member.role;
@@ -51,15 +53,19 @@ const requireRole = (minRole) => {
     try {
       const workspaceId = req.params.workspaceId || req.workspaceId;
       if (!workspaceId) {
-        return res.status(400).json({ error: 'workspaceId is required for role check.' });
+        return res
+          .status(400)
+          .json({ error: "workspaceId is required for role check." });
       }
 
       const member = await WorkspaceMember.findOne({
-        where: { workspace_id: workspaceId, user_id: req.user.id }
+        where: { workspace_id: workspaceId, user_id: req.user.id },
       });
 
       if (!member) {
-        return res.status(403).json({ error: 'You are not a member of this workspace.' });
+        return res
+          .status(403)
+          .json({ error: "You are not a member of this workspace." });
       }
 
       req.memberRole = member.role;
@@ -70,7 +76,7 @@ const requireRole = (minRole) => {
 
       if (userLevel < requiredLevel) {
         return res.status(403).json({
-          error: `Insufficient permissions. Required: ${minRole}, your role: ${member.role}.`
+          error: `Insufficient permissions. Required: ${minRole}, your role: ${member.role}.`,
         });
       }
 
@@ -93,4 +99,9 @@ const hasRoleLevel = (userRole, minRole) => {
   return (ROLE_HIERARCHY[userRole] || 0) >= (ROLE_HIERARCHY[minRole] || 0);
 };
 
-module.exports = { requireRole, attachWorkspaceRole, hasRoleLevel, ROLE_HIERARCHY };
+module.exports = {
+  requireRole,
+  attachWorkspaceRole,
+  hasRoleLevel,
+  ROLE_HIERARCHY,
+};

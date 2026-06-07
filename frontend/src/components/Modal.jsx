@@ -1,21 +1,29 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-export default function Modal({ isOpen, onClose, title, children, size = 'md' }) {
+export default function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  size = "md",
+}) {
   // Close on Escape
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    const handler = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   const sizes = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-2xl',
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
+    xl: "max-w-2xl",
   };
 
   return (
@@ -30,7 +38,9 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
         onClick={onClose}
       />
       {/* Panel */}
-      <div className={`relative bg-white rounded-xl shadow-2xl w-full ${sizes[size]} z-10 overflow-hidden`}>
+      <div
+        className={`relative bg-white rounded-xl shadow-2xl w-full ${sizes[size]} z-10 overflow-hidden`}
+      >
         {/* Header */}
         {title && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
