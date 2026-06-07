@@ -53,6 +53,7 @@ export default function Projects() {
   useEffect(() => {
     if (!activeWorkspace) return;
     fetchProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkspace?.id]);
 
   const handleCreate = async (e) => {
@@ -159,7 +160,7 @@ export default function Projects() {
           {projects.map((project) => (
             <div
               key={project.id}
-              className="bg-white rounded-xl border border-blue-200 shadow-md p-5 cursor-pointer group"
+              className="bg-white rounded-xl border border-blue-200 shadow-md p-5 cursor-pointer group flex flex-col justify-between"
               onClick={() => navigate(`/projects/${project.id}`)}
             >
               <div className="flex items-start justify-between mb-3">
@@ -168,15 +169,13 @@ export default function Projects() {
                 </div>
                 <ProjectStatusBadge status={project.status} />
               </div>
-              <h3 className="font-semibold text-gray-900">
-                {project.name}
-              </h3>
+              <h3 className="font-semibold text-gray-900">{project.name}</h3>
               {project.description && (
                 <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                   {project.description}
                 </p>
               )}
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50">
+              <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50 ">
                 <span className="text-xs text-gray-400">
                   {project.taskCount ?? 0} task
                   {project.taskCount !== 1 ? "s" : ""}
