@@ -48,5 +48,6 @@ export const signup = async (name, email, password) => {
 
 export const logout = () => {
   clearAuth();
-  window.location.href = "/login";
+  window.history.replaceState({}, "", "/login");
+  window.dispatchEvent(new PopStateEvent("popstate"));
 };

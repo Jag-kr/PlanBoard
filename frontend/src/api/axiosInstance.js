@@ -19,7 +19,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("planboard_token");
       localStorage.removeItem("planboard_user");
-      window.location.href = "/login";
+      window.history.replaceState({}, "", "/login");
+      window.dispatchEvent(new PopStateEvent("popstate"));
     }
     return Promise.reject(error);
   },
