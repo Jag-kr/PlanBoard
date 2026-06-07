@@ -18,16 +18,14 @@ import Members from "./pages/Members";
 import Settings from "./pages/Settings";
 
 /**
- * AppShell — fetches & caches workspaces on mount, then renders
- * the sidebar + topbar + page content layout.
- * Also manages mobile sidebar open/close state.
+ * AppShell — full-height sidebar + topbar + scrollable content layout.
+ * Manages mobile sidebar open/close state.
  */
 function AppShell({ children }) {
   const [loading, setLoading] = useState(!getActiveWorkspace());
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    // Re-fetch workspaces to keep localStorage fresh on every mount
     fetchAndCacheWorkspaces().finally(() => setLoading(false));
   }, []);
 
@@ -40,20 +38,21 @@ function AppShell({ children }) {
   }
 
   return (
-    <div className="app-shell">
-      {/* Mobile sidebar backdrop */}
+    <div className="flex h-screen overflow-hidden">
+      {/* Mobile backdrop — sits below sidebar, above content */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="app-shell__main">
+      {/* Main column: topbar + scrollable page */}
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Navbar onMenuToggle={() => setSidebarOpen((v) => !v)} />
-        <main className="app-shell__content">{children}</main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );
@@ -69,11 +68,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Auth required, no workspace needed */}
         <Route
           path="/onboarding"
           element={
@@ -83,7 +80,6 @@ export default function App() {
           }
         />
 
-        {/* Protected app routes */}
         <Route
           path="/dashboard"
           element={
@@ -139,7 +135,6 @@ export default function App() {
           }
         />
 
-        {/* Catch-all */}
         <Route path="/" element={<RootRedirect />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
