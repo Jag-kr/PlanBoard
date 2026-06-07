@@ -161,7 +161,6 @@ const acceptInvitation = async (req, res, next) => {
         workspace: {
           id: workspace.id,
           name: workspace.name,
-          slug: workspace.slug,
         },
       });
     }
@@ -181,7 +180,6 @@ const acceptInvitation = async (req, res, next) => {
       workspace: {
         id: workspace.id,
         name: workspace.name,
-        slug: workspace.slug,
       },
     });
   } catch (err) {

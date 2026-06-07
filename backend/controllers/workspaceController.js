@@ -10,30 +10,6 @@ const {
 } = require("../models");
 
 /**
- * Generate a URL-friendly slug from a workspace name.
- * Appends a random 4-char suffix if needed to ensure uniqueness.
- *
- * @param {string} name
- * @returns {Promise<string>}
- */
-const generateSlug = async (name) => {
-  const base = name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .slice(0, 50);
-
-  const exists = await Workspace.findOne({ where: { slug: base } });
-  if (!exists) return base;
-
-  // Append random 4-char hex
-  const suffix = Math.random().toString(36).slice(2, 6);
-  return `${base}-${suffix}`;
-};
-
-/**
  * POST /api/workspaces
  * Create a workspace and make the creator an ADMIN member.
  */
@@ -45,11 +21,9 @@ const create = async (req, res, next) => {
     }
 
     const { name } = req.body;
-    const slug = await generateSlug(name);
 
     const workspace = await Workspace.create({
       name: name.trim(),
-      slug,
       owner_id: req.user.id,
     });
 
@@ -105,7 +79,7 @@ const getMine = async (req, res, next) => {
 
 /**
  * PATCH /api/workspaces/:workspaceId
- * Update a workspace's name (and regenerate slug). ADMIN only.
+ * Update a workspace's name. ADMIN only.
  */
 const update = async (req, res, next) => {
   try {
@@ -123,7 +97,6 @@ const update = async (req, res, next) => {
     const { name } = req.body;
     if (name && name.trim() !== workspace.name) {
       workspace.name = name.trim();
-      workspace.slug = await generateSlug(name);
     }
 
     await workspace.save();

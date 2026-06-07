@@ -51,7 +51,6 @@ const options = {
           properties: {
             id: { type: "string", format: "uuid" },
             name: { type: "string" },
-            slug: { type: "string" },
             owner_id: { type: "string", format: "uuid" },
             createdAt: { type: "string", format: "date-time" },
           },

@@ -10,7 +10,6 @@ const Workspace = sequelize.define(
       primaryKey: true,
     },
     name: { type: DataTypes.STRING, allowNull: false },
-    slug: { type: DataTypes.STRING, allowNull: false, unique: true },
     owner_id: { type: DataTypes.UUID, allowNull: false },
   },
   { tableName: "workspaces", underscored: true },
