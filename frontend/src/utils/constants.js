@@ -59,17 +59,3 @@ export const ROLE_COLORS = {
   MEMBER: "bg-gray-100 text-gray-600",
 };
 
-export const KANBAN_COLUMNS = [
-  { id: "TODO", label: "To Do", headerColor: "border-gray-300 text-gray-600" },
-  {
-    id: "IN_PROGRESS",
-    label: "In Progress",
-    headerColor: "border-blue-400 text-blue-700",
-  },
-  {
-    id: "IN_REVIEW",
-    label: "In Review",
-    headerColor: "border-purple-400 text-purple-700",
-  },
-  { id: "DONE", label: "Done", headerColor: "border-green-400 text-green-700" },
-];
