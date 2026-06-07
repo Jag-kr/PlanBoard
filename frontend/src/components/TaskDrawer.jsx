@@ -97,15 +97,24 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
             <StatusBadge status={form.status} />
             <PriorityBadge priority={form.priority} />
           </div>
-          {canEditTask && dirty && (
+          <div className="flex items-center gap-2">
+            {canEditTask && dirty && (
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg disabled:opacity-50"
+              >
+                {saving ? "Saving…" : "Save"}
+              </button>
+            )}
             <button
-              onClick={handleSave}
+              onClick={onClose}
               disabled={saving}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg disabled:opacity-50"
+              className="px-3 py-1.5 text-xs font-medium text-white bg-red-500 rounded-lg disabled:opacity-50"
             >
-              {saving ? "Saving…" : "Save"}
+              Close
             </button>
-          )}
+          </div>
         </div>
 
         {!canEditTask && (
@@ -115,7 +124,7 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
         )}
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto space-y-5">
+        <div className="flex-1 overflow-y-auto space-y-5 p-2">
           {/* Title */}
           <input
             value={form.title}

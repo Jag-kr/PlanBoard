@@ -4,7 +4,7 @@ const ensureContainer = () => {
   if (toastContainer) return toastContainer;
   toastContainer = document.createElement("div");
   toastContainer.className =
-    "fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none";
+    "fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none";
   toastContainer.id = "toast-container";
   document.body.appendChild(toastContainer);
   return toastContainer;
@@ -20,7 +20,7 @@ const TOAST_STYLES = {
 export const toast = (message, type = "info", duration = 3500) => {
   const container = ensureContainer();
   const el = document.createElement("div");
-  el.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium transition-all duration-300 opacity-0 translate-x-4 ${TOAST_STYLES[type] || TOAST_STYLES.info}`;
+  el.className = `pointer-events-auto flex items-center gap-2 px-6 py-3 rounded-lg shadow-lg text-sm font-medium transition-all duration-300 opacity-0 translate-x-4 ${TOAST_STYLES[type] || TOAST_STYLES.info}`;
   el.textContent = message;
   container.appendChild(el);
   requestAnimationFrame(() => {
