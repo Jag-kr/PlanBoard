@@ -101,13 +101,8 @@ const invite = async (req, res, next) => {
       status: "PENDING",
     });
 
-    // Send invitation email (non-blocking failure)
-    await sendInvitationEmail(
-      normalizedEmail,
-      token,
-      workspace.name,
-      req.user.name,
-    );
+    // Send invitation email (non-blocking failure, do not wait for completion)
+    sendInvitationEmail(normalizedEmail, token, workspace.name, req.user.name);
 
     return res.status(201).json({
       invitation: {

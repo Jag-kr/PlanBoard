@@ -59,6 +59,7 @@ export default function Members() {
   useEffect(() => {
     if (!activeWorkspace) return;
     fetchMembers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkspace?.id]);
 
   const handleInvite = async (e) => {
@@ -224,6 +225,7 @@ export default function Members() {
               autoFocus
               required
               type="email"
+              disabled={inviting}
               value={inviteForm.email}
               onChange={(e) =>
                 setInviteForm({ ...inviteForm, email: e.target.value })
@@ -238,6 +240,7 @@ export default function Members() {
             </label>
             <select
               value={inviteForm.role}
+              disabled={inviting}
               onChange={(e) =>
                 setInviteForm({ ...inviteForm, role: e.target.value })
               }
