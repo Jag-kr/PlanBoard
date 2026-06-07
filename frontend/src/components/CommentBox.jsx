@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getComments, createComment, deleteComment } from "../api/comments";
-import { getSocket } from "../utils/socket";
 import Avatar from "./Avatar";
 import { timeAgo } from "../utils/helpers";
 import { toastError } from "../utils/toast";
@@ -16,6 +15,7 @@ export default function CommentBox({ taskId }) {
 
   const fetchComments = useCallback(async () => {
     if (!taskId) return;
+    setLoading(true);
     try {
       const res = await getComments(taskId);
       setComments(res.data.comments || []);
@@ -27,24 +27,8 @@ export default function CommentBox({ taskId }) {
   }, [taskId]);
 
   useEffect(() => {
-    setLoading(true);
     fetchComments();
   }, [fetchComments]);
-
-  // Real-time: listen for new comments
-  useEffect(() => {
-    const socket = getSocket();
-    const handler = ({ comment, taskId: tid }) => {
-      if (tid === taskId) {
-        setComments((prev) => {
-          if (prev.find((c) => c.id === comment.id)) return prev;
-          return [...prev, comment];
-        });
-      }
-    };
-    socket.on("comment:added", handler);
-    return () => socket.off("comment:added", handler);
-  }, [taskId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,8 +37,7 @@ export default function CommentBox({ taskId }) {
     try {
       await createComment(taskId, { body: body.trim() });
       setBody("");
-      // Comment will arrive via socket; also refresh in case socket missed it
-      setTimeout(fetchComments, 300);
+      fetchComments();
     } catch {
       toastError("Failed to post comment.");
     } finally {

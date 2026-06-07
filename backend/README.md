@@ -1,6 +1,6 @@
 # PlanBoard Server
 
-REST API backend for the PlanBoard project management platform. Built with Node.js, Express, PostgreSQL (Sequelize), Socket.IO, and Swagger.
+REST API backend for the PlanBoard project management platform. Built with Node.js, Express, PostgreSQL (Sequelize), and Swagger.
 
 ---
 
@@ -123,9 +123,6 @@ backend/
 │   └── comment.js
 ├── services/
 │   └── mailerService.js   # HTML invitation email sender
-├── sockets/
-│   ├── index.js           # Socket.IO setup (JWT auth + workspace rooms)
-│   └── emitter.js         # Singleton io instance for controllers
 ├── .env.example
 ├── .gitignore
 ├── package.json
@@ -137,54 +134,32 @@ backend/
 
 ## API Overview
 
-| Method | Endpoint | Auth | Role |
-|--------|----------|------|------|
-| POST | `/api/auth/signup` | — | — |
-| POST | `/api/auth/login` | — | — |
-| POST | `/api/workspaces` | ✅ | any |
-| GET | `/api/workspaces/mine` | ✅ | any |
-| PATCH | `/api/workspaces/:id` | ✅ | ADMIN |
-| GET | `/api/workspaces/:id/stats` | ✅ | member |
-| GET | `/api/workspaces/:id/members` | ✅ | member |
-| POST | `/api/workspaces/:id/invite` | ✅ | MANAGER+ |
-| PATCH | `/api/workspaces/:id/members/:uid` | ✅ | ADMIN |
-| DELETE | `/api/workspaces/:id/members/:uid` | ✅ | ADMIN |
-| POST | `/api/invitations/:token/accept` | ✅ | any |
-| GET | `/api/workspaces/:id/projects` | ✅ | member |
-| POST | `/api/workspaces/:id/projects` | ✅ | MANAGER+ |
-| PATCH | `/api/projects/:id` | ✅ | MANAGER+ |
-| DELETE | `/api/projects/:id` | ✅ | MANAGER+ |
-| GET | `/api/projects/:id/tasks` | ✅ | member |
-| POST | `/api/projects/:id/tasks` | ✅ | member |
-| PATCH | `/api/tasks/:id` | ✅ | member* |
-| DELETE | `/api/tasks/:id` | ✅ | MANAGER+ |
-| GET | `/api/tasks/:id/comments` | ✅ | member |
-| POST | `/api/tasks/:id/comments` | ✅ | member |
-| DELETE | `/api/comments/:id` | ✅ | author/MANAGER+ |
+| Method | Endpoint                           | Auth | Role            |
+| ------ | ---------------------------------- | ---- | --------------- |
+| POST   | `/api/auth/signup`                 | —    | —               |
+| POST   | `/api/auth/login`                  | —    | —               |
+| POST   | `/api/workspaces`                  | ✅   | any             |
+| GET    | `/api/workspaces/mine`             | ✅   | any             |
+| PATCH  | `/api/workspaces/:id`              | ✅   | ADMIN           |
+| GET    | `/api/workspaces/:id/stats`        | ✅   | member          |
+| GET    | `/api/workspaces/:id/members`      | ✅   | member          |
+| POST   | `/api/workspaces/:id/invite`       | ✅   | MANAGER+        |
+| PATCH  | `/api/workspaces/:id/members/:uid` | ✅   | ADMIN           |
+| DELETE | `/api/workspaces/:id/members/:uid` | ✅   | ADMIN           |
+| POST   | `/api/invitations/:token/accept`   | ✅   | any             |
+| GET    | `/api/workspaces/:id/projects`     | ✅   | member          |
+| POST   | `/api/workspaces/:id/projects`     | ✅   | MANAGER+        |
+| PATCH  | `/api/projects/:id`                | ✅   | MANAGER+        |
+| DELETE | `/api/projects/:id`                | ✅   | MANAGER+        |
+| GET    | `/api/projects/:id/tasks`          | ✅   | member          |
+| POST   | `/api/projects/:id/tasks`          | ✅   | member          |
+| PATCH  | `/api/tasks/:id`                   | ✅   | member\*        |
+| DELETE | `/api/tasks/:id`                   | ✅   | MANAGER+        |
+| GET    | `/api/tasks/:id/comments`          | ✅   | member          |
+| POST   | `/api/tasks/:id/comments`          | ✅   | member          |
+| DELETE | `/api/comments/:id`                | ✅   | author/MANAGER+ |
 
 > \* Members can only update tasks they created. MANAGER/ADMIN can update any task.
-
----
-
-## Real-time Events (Socket.IO)
-
-Connect with a JWT token:
-
-```js
-const socket = io('http://localhost:5000', {
-  auth: { token: '<your-jwt>' }
-});
-
-// Join a workspace room to receive updates
-socket.emit('join:workspace', '<workspaceId>');
-```
-
-| Event | Payload | Triggered by |
-|-------|---------|--------------|
-| `task:created` | `{ task, workspaceId }` | POST /tasks |
-| `task:updated` | `{ task, workspaceId }` | PATCH /tasks/:id |
-| `task:deleted` | `{ taskId, workspaceId }` | DELETE /tasks/:id |
-| `comment:added` | `{ comment, taskId, workspaceId }` | POST /comments |
 
 ---
 

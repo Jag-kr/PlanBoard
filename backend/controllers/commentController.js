@@ -1,7 +1,6 @@
 const { validationResult } = require("express-validator");
 const { Comment, Task, Project, WorkspaceMember, User } = require("../models");
 const { hasRoleLevel } = require("../middleware/rbac");
-const { emitToWorkspace } = require("../sockets/emitter");
 
 /**
  * GET /api/tasks/:taskId/comments
@@ -72,12 +71,6 @@ const createComment = async (req, res, next) => {
 
     const fullComment = await Comment.findByPk(comment.id, {
       include: [{ model: User, attributes: ["id", "name", "email"] }],
-    });
-
-    emitToWorkspace(workspaceId, "comment:added", {
-      comment: fullComment,
-      taskId,
-      workspaceId,
     });
 
     return res.status(201).json({ comment: fullComment });

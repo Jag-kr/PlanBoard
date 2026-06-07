@@ -1,13 +1,9 @@
 require("dotenv").config();
 const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const { sequelize } = require("./models");
-const { setIo } = require("./sockets/emitter");
-const initSockets = require("./sockets");
 const errorHandler = require("./middleware/errorHandler");
 
 // ── Route imports ──────────────────────────────────────────────────────────
@@ -18,20 +14,8 @@ const projectRoutes = require("./routes/project");
 const taskRoutes = require("./routes/task");
 const commentRoutes = require("./routes/comment");
 
-// ── App & HTTP server ──────────────────────────────────────────────────────
+// ── App ────────────────────────────────────────────────────────────────────
 const app = express();
-const server = http.createServer(app);
-
-// ── Socket.IO ──────────────────────────────────────────────────────────────
-const io = new Server(server, {
-  cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    credentials: true,
-  },
-});
-
-setIo(io);
-initSockets(io);
 
 // ── Express middleware ─────────────────────────────────────────────────────
 app.use(
@@ -93,7 +77,7 @@ const start = async () => {
     await sequelize.sync({ alter: true });
     console.log("[DB] Models synchronised.");
 
-    server.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`[Server] Running on port ${PORT}`);
       console.log(`[Docs]   http://localhost:${PORT}/api/docs`);
     });

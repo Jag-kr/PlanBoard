@@ -2,7 +2,7 @@ const express = require("express");
 const { body } = require("express-validator");
 const router = express.Router();
 const auth = require("../middleware/auth");
-const { requireRole } = require("../middleware/rbac");
+const { requireRole, attachWorkspaceRole } = require("../middleware/rbac");
 const workspaceController = require("../controllers/workspaceController");
 const memberController = require("../controllers/memberController");
 const dashboardController = require("../controllers/dashboardController");
@@ -125,7 +125,11 @@ router.patch(
  *       200:
  *         description: Dashboard stats object
  */
-router.get("/:workspaceId/stats", dashboardController.getStats);
+router.get(
+  "/:workspaceId/stats",
+  attachWorkspaceRole,
+  dashboardController.getStats,
+);
 
 /**
  * @swagger

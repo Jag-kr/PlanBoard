@@ -7,7 +7,6 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import { formatDate, isOverdue, timeAgo } from "../utils/helpers";
 import { toastError } from "../utils/toast";
-import { getSocket } from "../utils/socket";
 
 export default function Dashboard() {
   const { activeWorkspace } = useWorkspace();
@@ -30,20 +29,6 @@ export default function Dashboard() {
   useEffect(() => {
     fetchStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeWorkspace?.id]);
-
-  // Refresh on task changes
-  useEffect(() => {
-    const socket = getSocket();
-    const refresh = () => fetchStats();
-    socket.on("task:created", refresh);
-    socket.on("task:updated", refresh);
-    socket.on("task:deleted", refresh);
-    return () => {
-      socket.off("task:created", refresh);
-      socket.off("task:updated", refresh);
-      socket.off("task:deleted", refresh);
-    };
   }, [activeWorkspace?.id]);
 
   if (!activeWorkspace)

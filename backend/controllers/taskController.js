@@ -2,19 +2,6 @@ const { validationResult } = require("express-validator");
 const { Op } = require("sequelize");
 const { Task, Project, WorkspaceMember, Comment, User } = require("../models");
 const { hasRoleLevel } = require("../middleware/rbac");
-const { emitToWorkspace } = require("../sockets/emitter");
-
-/**
- * Resolve a project's workspace_id given a projectId.
- * @param {string} projectId
- * @returns {Promise<string|null>}
- */
-const getWorkspaceId = async (projectId) => {
-  const project = await Project.findByPk(projectId, {
-    attributes: ["workspace_id"],
-  });
-  return project ? project.workspace_id : null;
-};
 
 /**
  * GET /api/projects/:projectId/tasks
@@ -62,6 +49,7 @@ const getTasks = async (req, res, next) => {
 /**
  * POST /api/projects/:projectId/tasks
  * Create a task. Any workspace member can create.
+ * Only MANAGER+ can assign tasks (set assignee_id).
  */
 const createTask = async (req, res, next) => {
   try {
@@ -85,6 +73,15 @@ const createTask = async (req, res, next) => {
         .status(403)
         .json({ error: "You are not a member of this workspace." });
 
+    // Only MANAGER+ can assign tasks to others
+    const canAssign = hasRoleLevel(member.role, "MANAGER");
+    if (assignee_id && !canAssign) {
+      return res.status(403).json({
+        error:
+          "Insufficient permissions. Only Managers and Admins can assign tasks.",
+      });
+    }
+
     const task = await Task.create({
       project_id: projectId,
       title: title.trim(),
@@ -104,11 +101,6 @@ const createTask = async (req, res, next) => {
       ],
     });
 
-    emitToWorkspace(project.workspace_id, "task:created", {
-      task: fullTask,
-      workspaceId: project.workspace_id,
-    });
-
     return res.status(201).json({ task: fullTask });
   } catch (err) {
     next(err);
@@ -117,7 +109,9 @@ const createTask = async (req, res, next) => {
 
 /**
  * PATCH /api/tasks/:taskId
- * Update task fields. Any member for own tasks; ADMIN/MANAGER for any task.
+ * Update task fields.
+ * - ADMIN/MANAGER: can update any task field including assignee
+ * - MEMBER: can only update tasks assigned to them; cannot change assignee
  */
 const updateTask = async (req, res, next) => {
   try {
@@ -141,16 +135,26 @@ const updateTask = async (req, res, next) => {
         .status(403)
         .json({ error: "You are not a member of this workspace." });
 
-    // Permission: ADMIN/MANAGER can update any; others can only update own
     const isPrivileged = hasRoleLevel(member.role, "MANAGER");
-    if (!isPrivileged && task.created_by !== req.user.id) {
+
+    // Members can only update tasks assigned to them
+    if (!isPrivileged && task.assignee_id !== req.user.id) {
       return res
         .status(403)
-        .json({ error: "You can only update tasks you created." });
+        .json({ error: "You can only update tasks assigned to you." });
     }
 
     const { title, description, status, priority, assignee_id, due_date } =
       req.body;
+
+    // Only MANAGER+ can reassign tasks
+    if (assignee_id !== undefined && !isPrivileged) {
+      return res.status(403).json({
+        error:
+          "Insufficient permissions. Only Managers and Admins can assign tasks.",
+      });
+    }
+
     if (title !== undefined) task.title = title.trim();
     if (description !== undefined) task.description = description;
     if (status !== undefined) task.status = status;
@@ -166,11 +170,6 @@ const updateTask = async (req, res, next) => {
         { model: User, as: "creator", attributes: ["id", "name", "email"] },
         { model: Project, attributes: ["id", "name", "workspace_id"] },
       ],
-    });
-
-    emitToWorkspace(workspaceId, "task:updated", {
-      task: updatedTask,
-      workspaceId,
     });
 
     return res.status(200).json({ task: updatedTask });
@@ -203,8 +202,6 @@ const deleteTask = async (req, res, next) => {
 
     await Comment.destroy({ where: { task_id: taskId } });
     await task.destroy();
-
-    emitToWorkspace(workspaceId, "task:deleted", { taskId, workspaceId });
 
     return res.status(200).json({ message: "Task deleted successfully." });
   } catch (err) {

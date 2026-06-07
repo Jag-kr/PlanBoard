@@ -118,13 +118,13 @@ const deleteProject = async (req, res, next) => {
       return res.status(404).json({ error: "Project not found." });
     }
 
-    // Check role in owning workspace
+    // Check role in owning workspace — Delete requires ADMIN
     const member = await WorkspaceMember.findOne({
       where: { workspace_id: project.workspace_id, user_id: req.user.id },
     });
-    if (!member || !hasRoleLevel(member.role, "MANAGER")) {
+    if (!member || !hasRoleLevel(member.role, "ADMIN")) {
       return res.status(403).json({
-        error: "Insufficient permissions. Requires MANAGER or higher.",
+        error: "Insufficient permissions. Only Admins can delete projects.",
       });
     }
 

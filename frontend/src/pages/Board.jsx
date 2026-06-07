@@ -9,7 +9,6 @@ import Modal from "../components/Modal";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { PRIORITY_LIST } from "../utils/constants";
 import { toastError, toastSuccess } from "../utils/toast";
-import { getSocket } from "../utils/socket";
 import { hasRole } from "../utils/helpers";
 
 export default function Board() {
@@ -57,38 +56,6 @@ export default function Board() {
       .then((r) => setMembers(r.data.members || []))
       .catch(() => {});
   }, [activeWorkspace, activeWorkspace?.id]);
-
-  // Real-time task events
-  useEffect(() => {
-    const socket = getSocket();
-
-    const onCreated = ({ task }) => {
-      if (task.project_id === projectId) {
-        setTasks((prev) =>
-          prev.find((t) => t.id === task.id) ? prev : [task, ...prev],
-        );
-      }
-    };
-    const onUpdated = ({ task }) => {
-      if (task.project_id === projectId) {
-        setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
-        setSelectedTask((prev) => (prev?.id === task.id ? task : prev));
-      }
-    };
-    const onDeleted = ({ taskId }) => {
-      setTasks((prev) => prev.filter((t) => t.id !== taskId));
-      setSelectedTask((prev) => (prev?.id === taskId ? null : prev));
-    };
-
-    socket.on("task:created", onCreated);
-    socket.on("task:updated", onUpdated);
-    socket.on("task:deleted", onDeleted);
-    return () => {
-      socket.off("task:created", onCreated);
-      socket.off("task:updated", onUpdated);
-      socket.off("task:deleted", onDeleted);
-    };
-  }, [projectId]);
 
   const handleStatusChange = async (task, newStatus) => {
     try {
@@ -154,7 +121,7 @@ export default function Board() {
     );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem)]">
+    <div className="flex flex-col h-full">
       {/* Toolbar */}
       <div className="bg-white border-b border-gray-200 px-5 py-3 flex items-center gap-4 flex-shrink-0">
         <button

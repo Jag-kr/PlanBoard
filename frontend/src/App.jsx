@@ -3,6 +3,7 @@ import { useAuth } from "./context/AuthContext";
 import { useWorkspace } from "./context/WorkspaceContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
 import LoadingSpinner from "./components/LoadingSpinner";
 
 import Login from "./pages/Login";
@@ -14,11 +15,18 @@ import Board from "./pages/Board";
 import Members from "./pages/Members";
 import Settings from "./pages/Settings";
 
+/**
+ * AppShell — sidebar on the left, topbar + content on the right.
+ * The sidebar is collapsible (state lives inside Sidebar.jsx).
+ */
 function AppShell({ children }) {
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      <Navbar />
-      <main className="flex-1">{children}</main>
+    <div className="app-shell">
+      <Sidebar />
+      <div className="app-shell__main">
+        <Navbar />
+        <main className="app-shell__content">{children}</main>
+      </div>
     </div>
   );
 }

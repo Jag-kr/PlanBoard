@@ -90,7 +90,7 @@ router.get("/projects/:projectId/tasks", auth, taskController.getTasks);
  *                 format: date
  *     responses:
  *       201:
- *         description: Task created. Socket event task:created emitted.
+ *         description: Task created.
  *       403:
  *         description: Not a workspace member
  *       422:
@@ -140,7 +140,7 @@ router.post(
  *                 format: date
  *     responses:
  *       200:
- *         description: Task updated. Socket event task:updated emitted.
+ *         description: Task updated.
  *       403:
  *         description: Insufficient permissions
  *       404:
@@ -183,7 +183,7 @@ router.patch(
  *           type: string
  *     responses:
  *       200:
- *         description: Task deleted. Socket event task:deleted emitted.
+ *         description: Task deleted.
  *       403:
  *         description: Insufficient permissions
  *       404:

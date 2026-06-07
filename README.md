@@ -2,16 +2,15 @@
 
 **Multi-Tenant SaaS Project Management Platform** — Jira-inspired Kanban board with real-time collaboration, workspace RBAC, and live comment threads.
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18 + Vite + Tailwind CSS |
-| Backend | Node.js + Express + Sequelize ORM |
-| Database | PostgreSQL 16 |
-| Auth | JWT (localStorage) |
-| Real-time | Socket.IO |
-| Email | Nodemailer + Gmail App Password |
-| API Docs | Swagger UI at `/api/docs` |
-| Deploy | Render (Static Site + Web Service + Managed DB) |
+| Layer    | Technology                                      |
+| -------- | ----------------------------------------------- |
+| Frontend | React 18 + Vite + Tailwind CSS                  |
+| Backend  | Node.js + Express + Sequelize ORM               |
+| Database | PostgreSQL 16                                   |
+| Auth     | JWT (localStorage)                              |
+| Email    | Nodemailer + Gmail App Password                 |
+| API Docs | Swagger UI at `/api/docs`                       |
+| Deploy   | Render (Static Site + Web Service + Managed DB) |
 
 ---
 
@@ -27,7 +26,7 @@ PlanBoard/
 │   │   ├── components/     # Navbar, KanbanBoard, TaskDrawer, etc.
 │   │   ├── context/        # AuthContext, WorkspaceContext
 │   │   ├── pages/          # Login, Signup, Dashboard, Board, …
-│   │   └── utils/          # helpers, socket, toast, constants
+│   │   └── utils/          # helpers, toast, constants
 │   ├── .env.example
 │   └── vite.config.js
 │
@@ -38,7 +37,6 @@ PlanBoard/
 │   ├── models/             # User, Workspace, Project, Task, …
 │   ├── routes/
 │   ├── services/           # mailerService.js
-│   ├── sockets/            # Socket.IO init + emitter
 │   ├── swagger.js
 │   ├── server.js
 │   └── .env.example
@@ -73,13 +71,13 @@ cp .env.example .env
 
 Open `backend/.env` and set:
 
-| Variable | Value |
-|---|---|
+| Variable       | Value                                               |
+| -------------- | --------------------------------------------------- |
 | `DATABASE_URL` | `postgres://<user>:<pass>@localhost:5432/planboard` |
-| `JWT_SECRET` | Any long random string |
-| `CLIENT_URL` | `http://localhost:3000` |
-| `GMAIL_USER` | Your Gmail address *(optional — for invite emails)* |
-| `GMAIL_PASS` | Gmail App Password *(optional)* |
+| `JWT_SECRET`   | Any long random string                              |
+| `CLIENT_URL`   | `http://localhost:3000`                             |
+| `GMAIL_USER`   | Your Gmail address _(optional — for invite emails)_ |
+| `GMAIL_PASS`   | Gmail App Password _(optional)_                     |
 
 ```bash
 # Create the database
@@ -99,8 +97,6 @@ npm run dev
 cd frontend
 
 cp .env.example .env
-# Local dev: leave VITE_API_URL and VITE_SOCKET_URL empty
-# Vite proxy routes /api and /socket.io to localhost:5000
 
 npm install
 npm run dev
@@ -109,12 +105,12 @@ npm run dev
 
 ### Local URLs
 
-| Service | URL |
-|---|---|
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:5000 |
+| Service            | URL                            |
+| ------------------ | ------------------------------ |
+| Frontend           | http://localhost:3000          |
+| Backend API        | http://localhost:5000          |
 | API Docs (Swagger) | http://localhost:5000/api/docs |
-| Health check | http://localhost:5000/health |
+| Health check       | http://localhost:5000/health   |
 
 ---
 
@@ -140,24 +136,24 @@ Render Project: PlanBoard
 1. **New → Web Service** → connect your GitHub repo
 2. Settings:
 
-| Field | Value |
-|---|---|
-| Name | `planboard-server` |
-| Root Directory | `backend` |
-| Runtime | Node |
-| Build Command | `npm install` |
-| Start Command | `npm start` |
+| Field          | Value              |
+| -------------- | ------------------ |
+| Name           | `planboard-server` |
+| Root Directory | `backend`          |
+| Runtime        | Node               |
+| Build Command  | `npm install`      |
+| Start Command  | `npm start`        |
 
 3. Environment variables:
 
-| Key | Value |
-|---|---|
-| `DATABASE_URL` | Internal Database URL from Step 1 |
-| `JWT_SECRET` | A long random secret (generate with `openssl rand -hex 32`) |
-| `CLIENT_URL` | `https://planboard-client.onrender.com` *(set after frontend is deployed)* |
-| `GMAIL_USER` | Your Gmail address *(optional)* |
-| `GMAIL_PASS` | Gmail App Password *(optional)* |
-| `NODE_ENV` | `production` |
+| Key            | Value                                                                      |
+| -------------- | -------------------------------------------------------------------------- |
+| `DATABASE_URL` | Internal Database URL from Step 1                                          |
+| `JWT_SECRET`   | A long random secret (generate with `openssl rand -hex 32`)                |
+| `CLIENT_URL`   | `https://planboard-client.onrender.com` _(set after frontend is deployed)_ |
+| `GMAIL_USER`   | Your Gmail address _(optional)_                                            |
+| `GMAIL_PASS`   | Gmail App Password _(optional)_                                            |
+| `NODE_ENV`     | `production`                                                               |
 
 4. Deploy — note the service URL (e.g. `https://planboard-server.onrender.com`)
 
@@ -166,25 +162,24 @@ Render Project: PlanBoard
 1. **New → Static Site** → connect your GitHub repo
 2. Settings:
 
-| Field | Value |
-|---|---|
-| Name | `planboard-client` |
-| Root Directory | `frontend` |
-| Build Command | `npm install && npm run build` |
-| Publish Directory | `dist` |
+| Field             | Value                          |
+| ----------------- | ------------------------------ |
+| Name              | `planboard-client`             |
+| Root Directory    | `frontend`                     |
+| Build Command     | `npm install && npm run build` |
+| Publish Directory | `dist`                         |
 
 3. Environment variables:
 
 | Key | Value |
-|---|---|
-| `VITE_API_URL` | `https://planboard-server.onrender.com` |
-| `VITE_SOCKET_URL` | `https://planboard-server.onrender.com` |
+| --- | ----- |
 
 4. Deploy
 
 ### Step 4 — Update CORS on backend
 
 Go back to `planboard-server` on Render and update:
+
 ```
 CLIENT_URL = https://planboard-client.onrender.com
 ```
@@ -199,23 +194,14 @@ Trigger a redeploy.
 
 ### `backend/.env`
 
-| Variable | Required | Description |
-|---|:---:|---|
-| `PORT` | No | HTTP port (default: 5000) |
-| `DATABASE_URL` | ✅ | Full PostgreSQL connection string |
-| `JWT_SECRET` | ✅ | Secret for signing JWTs |
-| `CLIENT_URL` | ✅ | Frontend origin (CORS whitelist) |
-| `GMAIL_USER` | No | Gmail address for invite emails |
-| `GMAIL_PASS` | No | Gmail [App Password](https://support.google.com/accounts/answer/185833) |
-
-### `frontend/.env`
-
-| Variable | Required | Description |
-|---|:---:|---|
-| `VITE_API_URL` | No* | Backend base URL. Empty = use Vite proxy (local dev) |
-| `VITE_SOCKET_URL` | No* | Socket.IO server URL. Empty = same origin |
-
-*Required in production (Render), optional in local dev.
+| Variable       | Required | Description                                                             |
+| -------------- | :------: | ----------------------------------------------------------------------- |
+| `PORT`         |    No    | HTTP port (default: 5000)                                               |
+| `DATABASE_URL` |    ✅    | Full PostgreSQL connection string                                       |
+| `JWT_SECRET`   |    ✅    | Secret for signing JWTs                                                 |
+| `CLIENT_URL`   |    ✅    | Frontend origin (CORS whitelist)                                        |
+| `GMAIL_USER`   |    No    | Gmail address for invite emails                                         |
+| `GMAIL_PASS`   |    No    | Gmail [App Password](https://support.google.com/accounts/answer/185833) |
 
 ---
 
@@ -223,51 +209,32 @@ Trigger a redeploy.
 
 Full interactive docs at `/api/docs` (Swagger UI).
 
-| Method | Endpoint | Auth | Min Role |
-|---|---|:---:|---|
-| POST | `/api/auth/signup` | No | — |
-| POST | `/api/auth/login` | No | — |
-| GET | `/api/workspaces/mine` | JWT | — |
-| POST | `/api/workspaces` | JWT | — |
-| PATCH | `/api/workspaces/:id` | JWT | ADMIN |
-| GET | `/api/workspaces/:id/stats` | JWT | MEMBER |
-| GET | `/api/workspaces/:id/members` | JWT | MEMBER |
-| POST | `/api/workspaces/:id/invite` | JWT | MANAGER |
-| POST | `/api/invitations/:token/accept` | JWT | — |
-| PATCH | `/api/workspaces/:id/members/:userId` | JWT | ADMIN |
-| DELETE | `/api/workspaces/:id/members/:userId` | JWT | ADMIN |
-| GET | `/api/workspaces/:id/projects` | JWT | MEMBER |
-| POST | `/api/workspaces/:id/projects` | JWT | MANAGER |
-| PATCH | `/api/projects/:id` | JWT | MANAGER |
-| DELETE | `/api/projects/:id` | JWT | MANAGER |
-| GET | `/api/projects/:id/tasks` | JWT | MEMBER |
-| POST | `/api/projects/:id/tasks` | JWT | MEMBER |
-| PATCH | `/api/tasks/:id` | JWT | MEMBER |
-| DELETE | `/api/tasks/:id` | JWT | MANAGER |
-| GET | `/api/tasks/:id/comments` | JWT | MEMBER |
-| POST | `/api/tasks/:id/comments` | JWT | MEMBER |
-| DELETE | `/api/comments/:id` | JWT | MEMBER* |
+| Method | Endpoint                              | Auth | Min Role |
+| ------ | ------------------------------------- | :--: | -------- |
+| POST   | `/api/auth/signup`                    |  No  | —        |
+| POST   | `/api/auth/login`                     |  No  | —        |
+| GET    | `/api/workspaces/mine`                | JWT  | —        |
+| POST   | `/api/workspaces`                     | JWT  | —        |
+| PATCH  | `/api/workspaces/:id`                 | JWT  | ADMIN    |
+| GET    | `/api/workspaces/:id/stats`           | JWT  | MEMBER   |
+| GET    | `/api/workspaces/:id/members`         | JWT  | MEMBER   |
+| POST   | `/api/workspaces/:id/invite`          | JWT  | MANAGER  |
+| POST   | `/api/invitations/:token/accept`      | JWT  | —        |
+| PATCH  | `/api/workspaces/:id/members/:userId` | JWT  | ADMIN    |
+| DELETE | `/api/workspaces/:id/members/:userId` | JWT  | ADMIN    |
+| GET    | `/api/workspaces/:id/projects`        | JWT  | MEMBER   |
+| POST   | `/api/workspaces/:id/projects`        | JWT  | MANAGER  |
+| PATCH  | `/api/projects/:id`                   | JWT  | MANAGER  |
+| DELETE | `/api/projects/:id`                   | JWT  | MANAGER  |
+| GET    | `/api/projects/:id/tasks`             | JWT  | MEMBER   |
+| POST   | `/api/projects/:id/tasks`             | JWT  | MEMBER   |
+| PATCH  | `/api/tasks/:id`                      | JWT  | MEMBER   |
+| DELETE | `/api/tasks/:id`                      | JWT  | MANAGER  |
+| GET    | `/api/tasks/:id/comments`             | JWT  | MEMBER   |
+| POST   | `/api/tasks/:id/comments`             | JWT  | MEMBER   |
+| DELETE | `/api/comments/:id`                   | JWT  | MEMBER\* |
 
 \* Own comments only; MANAGER+ can delete any.
-
----
-
-## Socket.IO Events
-
-Connect with JWT auth:
-```js
-const socket = io('https://planboard-server.onrender.com', {
-  auth: { token: localStorage.getItem('planboard_token') }
-});
-socket.emit('join:workspace', workspaceId);
-```
-
-| Event (server → client) | Payload | Trigger |
-|---|---|---|
-| `task:created` | `{ task }` | New task added to any project |
-| `task:updated` | `{ task }` | Task fields changed |
-| `task:deleted` | `{ taskId }` | Task removed |
-| `comment:added` | `{ comment }` | New comment posted |
 
 ---
 
@@ -278,7 +245,6 @@ socket.emit('join:workspace', workspaceId);
 - 👥 **RBAC** — ADMIN / MANAGER / MEMBER with enforced permissions on every endpoint
 - 📋 **Kanban board** — 4 columns: Todo → In Progress → In Review → Done
 - 🖱️ **Drag & Drop** — HTML5 Drag API, no external libraries
-- ⚡ **Real-time** — task and comment updates across browser sessions via Socket.IO
 - 💬 **Comments** — live comment threads with Ctrl+Enter to post
 - 📊 **Dashboard** — stat cards, My Tasks, Recent Activity feed
 - 📧 **Invitations** — styled HTML email invites via Nodemailer + Gmail
@@ -289,12 +255,12 @@ socket.emit('join:workspace', workspaceId);
 
 ## RBAC Matrix
 
-| Action | ADMIN | MANAGER | MEMBER |
-|---|:---:|:---:|:---:|
-| Workspace settings | ✅ | ❌ | ❌ |
-| Invite / remove members | ✅ | ✅ | ❌ |
-| Create / delete projects | ✅ | ✅ | ❌ |
-| Create / assign tasks | ✅ | ✅ | ✅ |
-| Delete any task | ✅ | ✅ | ❌ |
-| Comment on tasks | ✅ | ✅ | ✅ |
-| Delete own comments | ✅ | ✅ | ✅ |
+| Action                   | ADMIN | MANAGER | MEMBER |
+| ------------------------ | :---: | :-----: | :----: |
+| Workspace settings       |  ✅   |   ❌    |   ❌   |
+| Invite / remove members  |  ✅   |   ✅    |   ❌   |
+| Create / delete projects |  ✅   |   ✅    |   ❌   |
+| Create / assign tasks    |  ✅   |   ✅    |   ✅   |
+| Delete any task          |  ✅   |   ✅    |   ❌   |
+| Comment on tasks         |  ✅   |   ✅    |   ✅   |
+| Delete own comments      |  ✅   |   ✅    |   ✅   |

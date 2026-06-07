@@ -88,7 +88,7 @@ router.get("/tasks/:taskId/comments", auth, commentController.getComments);
  *                 example: This looks good, will review tomorrow.
  *     responses:
  *       201:
- *         description: Comment created. Socket event comment:added emitted.
+ *         description: Comment created.
  *       403:
  *         description: Not a workspace member
  *       422:

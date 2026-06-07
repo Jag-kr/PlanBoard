@@ -9,8 +9,7 @@ const options = {
       version: "1.0.0",
       description:
         "REST API for PlanBoard — a collaborative project management platform. " +
-        "Provides endpoints for authentication, workspaces, projects, tasks, comments, " +
-        "and real-time updates via Socket.IO.",
+        "Provides endpoints for authentication, workspaces, projects, tasks, comments, ",
       contact: {
         name: "PlanBoard Team",
       },

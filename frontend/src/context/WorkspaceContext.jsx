@@ -6,7 +6,6 @@ import {
   useEffect,
 } from "react";
 import * as workspacesApi from "../api/workspaces";
-import { joinWorkspace, leaveWorkspace } from "../utils/socket";
 import { useAuth } from "./AuthContext";
 
 const WorkspaceContext = createContext(null);
@@ -33,7 +32,6 @@ export function WorkspaceProvider({ children }) {
       if (found) {
         setActiveWorkspace(found);
         localStorage.setItem(WS_KEY, found.id);
-        joinWorkspace(found.id);
       }
     } catch (err) {
       console.error("[WorkspaceContext] fetchWorkspaces error:", err);
@@ -51,15 +49,10 @@ export function WorkspaceProvider({ children }) {
     }
   }, [isAuthenticated, fetchWorkspaces]);
 
-  const switchWorkspace = useCallback(
-    (workspace) => {
-      if (activeWorkspace?.id) leaveWorkspace(activeWorkspace.id);
-      setActiveWorkspace(workspace);
-      localStorage.setItem(WS_KEY, workspace.id);
-      joinWorkspace(workspace.id);
-    },
-    [activeWorkspace],
-  );
+  const switchWorkspace = useCallback((workspace) => {
+    setActiveWorkspace(workspace);
+    localStorage.setItem(WS_KEY, workspace.id);
+  }, []);
 
   const createWorkspace = useCallback(
     async (name) => {

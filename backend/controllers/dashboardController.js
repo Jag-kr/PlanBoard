@@ -1,23 +1,20 @@
 const { Op } = require("sequelize");
 const { Project, Task, WorkspaceMember, User } = require("../models");
+const { hasRoleLevel } = require("../middleware/rbac");
 
 /**
  * GET /api/workspaces/:workspaceId/stats
  * Full dashboard statistics for a workspace.
+ * Role-aware: members only see activity for tasks assigned to them.
  */
 const getStats = async (req, res, next) => {
   try {
     const { workspaceId } = req.params;
 
-    // Verify membership
-    const member = await WorkspaceMember.findOne({
-      where: { workspace_id: workspaceId, user_id: req.user.id },
-    });
-    if (!member) {
-      return res
-        .status(403)
-        .json({ error: "You are not a member of this workspace." });
-    }
+    // req.memberRole is attached by attachWorkspaceRole middleware on this route
+    const memberRole = req.memberRole;
+    const userId = req.user.id;
+    const isPrivileged = hasRoleLevel(memberRole, "MANAGER");
 
     // Get all project IDs in this workspace
     const projects = await Project.findAll({
@@ -59,7 +56,7 @@ const getStats = async (req, res, next) => {
         : await Task.findAll({
             where: {
               project_id: { [Op.in]: projectIds },
-              assignee_id: req.user.id,
+              assignee_id: userId,
               status: { [Op.ne]: "DONE" },
             },
             include: [{ model: Project, attributes: ["id", "name"] }],
@@ -67,12 +64,21 @@ const getStats = async (req, res, next) => {
             limit: 20,
           });
 
-    // Recent activity: last 10 updated tasks in workspace
-    const recentActivity =
+    // Recent activity:
+    // - ADMIN/MANAGER: last 10 updated tasks across the whole workspace
+    // - MEMBER: last 10 tasks assigned to them
+    const activityWhere =
       projectIds.length === 0
+        ? null
+        : isPrivileged
+          ? { project_id: { [Op.in]: projectIds } }
+          : { project_id: { [Op.in]: projectIds }, assignee_id: userId };
+
+    const recentActivity =
+      activityWhere === null
         ? []
         : await Task.findAll({
-            where: { project_id: { [Op.in]: projectIds } },
+            where: activityWhere,
             include: [
               { model: Project, attributes: ["id", "name"] },
               {
@@ -92,6 +98,7 @@ const getStats = async (req, res, next) => {
       completedTasks,
       myTasks,
       recentActivity,
+      role: memberRole,
     });
   } catch (err) {
     next(err);
