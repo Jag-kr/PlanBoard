@@ -29,22 +29,12 @@ function getInitials(name = "") {
     .join("");
 }
 
-/**
- * Sidebar — Tailwind UI sidebar-navigation pattern.
- *
- * Mobile  (<lg): fixed overlay, slides in from left via translate-x.
- * Desktop (lg+): static in-flow column, collapsible to icon-only width.
- *
- * Props:
- *   open    — boolean, controls mobile overlay visibility
- *   onClose — fn, called when sidebar should close on mobile
- */
 export default function Sidebar({ open = false, onClose }) {
   const user = getUser();
   const workspace = getActiveWorkspace();
   const userRole = workspace?.role || "MEMBER";
 
-  // Desktop-only collapse (ignored on mobile — always full width there)
+  // Desktop-only collapse state (mobile always expanded)
   const [collapsed, setCollapsed] = useState(false);
 
   const visibleItems = NAV_ITEMS.filter(
@@ -52,12 +42,6 @@ export default function Sidebar({ open = false, onClose }) {
   );
 
   return (
-    /*
-     * On mobile:  fixed, z-50, full height, w-64
-     *             -translate-x-full by default → translate-x-0 when open
-     * On desktop: lg:static overrides fixed; lg:translate-x-0 always visible
-     *             width toggles between lg:w-16 (collapsed) and lg:w-56
-     */
     <aside
       className={[
         // Shared
