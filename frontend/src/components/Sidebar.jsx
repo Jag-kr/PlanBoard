@@ -1,100 +1,36 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import {
+  Squares2X2Icon,
+  FolderIcon,
+  UsersIcon,
+  Cog6ToothIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ArrowLeftStartOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 import { getUser, logout } from "../utils/auth";
 import { getActiveWorkspace } from "../utils/workspace";
 import { hasRole } from "../utils/helpers";
 
 const NAV_ITEMS = [
-  {
-    to: "/dashboard",
-    label: "Dashboard",
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.8}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <rect x="3" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="3" width="7" height="7" rx="1" />
-        <rect x="3" y="14" width="7" height="7" rx="1" />
-        <rect x="14" y="14" width="7" height="7" rx="1" />
-      </svg>
-    ),
-  },
-  {
-    to: "/projects",
-    label: "Projects",
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.8}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
-      </svg>
-    ),
-  },
-  {
-    to: "/members",
-    label: "Members",
-    minRole: "MANAGER",
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.8}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
-      </svg>
-    ),
-  },
-  {
-    to: "/settings",
-    label: "Settings",
-    minRole: "ADMIN",
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.8}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-      </svg>
-    ),
-  },
+  { to: "/dashboard", label: "Dashboard", Icon: Squares2X2Icon },
+  { to: "/projects", label: "Projects", Icon: FolderIcon },
+  { to: "/members", label: "Members", Icon: UsersIcon, minRole: "MANAGER" },
+  { to: "/settings", label: "Settings", Icon: Cog6ToothIcon, minRole: "ADMIN" },
 ];
 
 /**
  * Sidebar component.
- *
  * Props:
- *  - open     : boolean — controls mobile overlay visibility (passed from AppShell)
- *  - onClose  : fn      — called when user closes sidebar on mobile
- *
- * On desktop (lg+) the sidebar is always visible and can be collapsed/expanded.
- * On mobile (<lg) it is a fixed overlay that slides in when `open` is true.
+ *  - open    : boolean — controls mobile overlay visibility
+ *  - onClose : fn      — called when user closes sidebar on mobile
  */
 export default function Sidebar({ open = false, onClose }) {
   const user = getUser();
   const workspace = getActiveWorkspace();
   const userRole = workspace?.role || "MEMBER";
 
-  // Desktop collapse state (only meaningful on lg+)
   const [collapsed, setCollapsed] = useState(false);
 
   const visibleItems = NAV_ITEMS.filter(
@@ -109,10 +45,11 @@ export default function Sidebar({ open = false, onClose }) {
       .map((n) => n[0].toUpperCase())
       .join("");
 
-  // On mobile a nav click should close the sidebar
   const handleNavClick = () => {
     if (onClose) onClose();
   };
+
+  const CollapseIcon = collapsed ? ChevronRightIcon : ChevronLeftIcon;
 
   return (
     <aside
@@ -134,40 +71,24 @@ export default function Sidebar({ open = false, onClose }) {
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="sidebar__toggle-icon"
-          >
-            {collapsed ? (
-              <path d="M9 18l6-6-6-6" />
-            ) : (
-              <path d="M15 18l-6-6 6-6" />
-            )}
-          </svg>
+          <CollapseIcon className="sidebar__toggle-icon" />
         </button>
       </div>
 
       {/* Nav links */}
       <nav className="sidebar__nav">
-        {visibleItems.map((item) => (
+        {visibleItems.map(({ to, label, Icon }) => (
           <NavLink
-            key={item.to}
-            to={item.to}
+            key={to}
+            to={to}
             onClick={handleNavClick}
             className={({ isActive }) =>
               `sidebar__link ${isActive ? "sidebar__link--active" : ""}`
             }
-            title={collapsed ? item.label : undefined}
+            title={collapsed ? label : undefined}
           >
-            <span className="sidebar__link-icon">{item.icon}</span>
-            {!collapsed && (
-              <span className="sidebar__link-label">{item.label}</span>
-            )}
+            <Icon className="sidebar__link-icon" />
+            {!collapsed && <span className="sidebar__link-label">{label}</span>}
           </NavLink>
         ))}
       </nav>
@@ -196,19 +117,7 @@ export default function Sidebar({ open = false, onClose }) {
           title="Sign out"
           aria-label="Sign out"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.8}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="sidebar__logout-icon"
-          >
-            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
+          <ArrowLeftStartOnRectangleIcon className="sidebar__logout-icon" />
           {!collapsed && <span>Sign out</span>}
         </button>
       </div>

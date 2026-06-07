@@ -1,5 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import {
+  Bars3Icon,
+  ChevronDownIcon,
+  CheckIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
+import {
   getWorkspaces,
   getActiveWorkspace,
   switchWorkspace,
@@ -12,7 +18,6 @@ import { toastError } from "../utils/toast";
  * Top bar — hamburger menu (mobile), workspace switcher + create workspace modal.
  */
 export default function Navbar({ onMenuToggle }) {
-  // Read from localStorage on mount — always fresh after reload
   const [workspaces] = useState(() => getWorkspaces());
   const [activeWorkspace] = useState(() => getActiveWorkspace());
 
@@ -38,7 +43,6 @@ export default function Navbar({ onMenuToggle }) {
     setCreating(true);
     try {
       await createWorkspace(newWsName.trim());
-      // Full reload to apply new active workspace everywhere
       window.location.href = "/dashboard";
     } catch (err) {
       toastError(err.response?.data?.error || "Failed to create workspace.");
@@ -49,26 +53,14 @@ export default function Navbar({ onMenuToggle }) {
   return (
     <>
       <header className="topbar">
-        {/* Hamburger — visible only on mobile */}
+        {/* Hamburger — mobile only */}
         <button
           id="sidebar-hamburger"
           className="lg:hidden p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors flex-shrink-0"
           onClick={onMenuToggle}
           aria-label="Open navigation menu"
         >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
+          <Bars3Icon className="h-5 w-5" />
         </button>
 
         <div ref={wsRef} className="topbar__workspace">
@@ -83,19 +75,7 @@ export default function Navbar({ onMenuToggle }) {
             <span className="topbar__ws-name">
               {activeWorkspace?.name || "No workspace"}
             </span>
-            <svg
-              className="topbar__ws-chevron"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+            <ChevronDownIcon className="topbar__ws-chevron" />
           </button>
 
           {wsDropOpen && (
@@ -115,17 +95,7 @@ export default function Navbar({ onMenuToggle }) {
                   </span>
                   <span className="topbar__ws-item-name">{ws.name}</span>
                   {ws.id === activeWorkspace?.id && (
-                    <svg
-                      className="topbar__ws-check"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    <CheckIcon className="topbar__ws-check" />
                   )}
                 </button>
               ))}
@@ -137,7 +107,8 @@ export default function Navbar({ onMenuToggle }) {
                 }}
                 className="topbar__ws-create"
               >
-                <span>＋</span> New workspace
+                <PlusIcon className="h-4 w-4" />
+                New workspace
               </button>
             </div>
           )}

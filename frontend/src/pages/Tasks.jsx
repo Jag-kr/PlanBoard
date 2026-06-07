@@ -1,9 +1,18 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import {
+  ChevronLeftIcon,
+  PlusIcon,
+  MagnifyingGlassIcon,
+  XMarkIcon,
+  TrashIcon,
+  ChevronUpDownIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+} from "@heroicons/react/24/outline";
 import { getTasks, createTask, deleteTask } from "../api/tasks";
 import { getMembers } from "../api/members";
 import { getActiveWorkspace } from "../utils/workspace";
-import { getUser } from "../utils/auth";
 import TaskDrawer from "../components/TaskDrawer";
 import Modal from "../components/Modal";
 import ConfirmDialog from "../components/ConfirmDialog";
@@ -31,15 +40,23 @@ function useDebounce(value, delay = 300) {
   return debounced;
 }
 
+// Sort indicator icon
+function SortIcon({ col, sortKey, sortAsc }) {
+  if (sortKey !== col)
+    return <ChevronUpDownIcon className="h-3 w-3 text-gray-300 ml-1 inline" />;
+  return sortAsc ? (
+    <ChevronUpIcon className="h-3 w-3 text-blue-500 ml-1 inline" />
+  ) : (
+    <ChevronDownIcon className="h-3 w-3 text-blue-500 ml-1 inline" />
+  );
+}
+
 // ── component ──────────────────────────────────────────────────────────────────
 export default function Tasks() {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
   const activeWorkspace = getActiveWorkspace();
-  const currentUser = getUser();
   const canManage = hasRole(activeWorkspace?.role, "MANAGER");
-  const canEditTask = (task) =>
-    canManage || task.assignee_id === currentUser?.id;
 
   // ── state ──────────────────────────────────────────────────────────────────
   const [tasks, setTasks] = useState([]);
@@ -63,7 +80,7 @@ export default function Tasks() {
   const [filterStatus, setFilterStatus] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [filterAssignee, setFilterAssignee] = useState("");
-  const [sortKey, setSortKey] = useState("created"); // created | title | priority | due_date | status
+  const [sortKey, setSortKey] = useState("created");
   const [sortAsc, setSortAsc] = useState(false);
 
   const debouncedSearch = useDebounce(search, 300);
@@ -83,57 +100,48 @@ export default function Tasks() {
 
   useEffect(() => {
     fetchTasks();
-  }, [fetchTasks]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!activeWorkspace) return;
     getMembers(activeWorkspace.id)
       .then((r) => setMembers(r.data.members || []))
       .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkspace?.id]);
 
   // ── client-side filter + sort ──────────────────────────────────────────────
   const filtered = useMemo(() => {
     let list = [...tasks];
 
-    // search
     if (debouncedSearch.trim()) {
       const q = debouncedSearch.toLowerCase();
       list = list.filter((t) => t.title.toLowerCase().includes(q));
     }
-    // status filter
     if (filterStatus) list = list.filter((t) => t.status === filterStatus);
-    // priority filter
     if (filterPriority)
       list = list.filter((t) => t.priority === filterPriority);
-    // assignee filter
     if (filterAssignee) {
-      if (filterAssignee === "__unassigned__") {
+      if (filterAssignee === "__unassigned__")
         list = list.filter((t) => !t.assignee_id);
-      } else {
-        list = list.filter((t) => t.assignee_id === filterAssignee);
-      }
+      else list = list.filter((t) => t.assignee_id === filterAssignee);
     }
 
-    // sort
     list.sort((a, b) => {
       let cmp = 0;
-      if (sortKey === "title") {
-        cmp = a.title.localeCompare(b.title);
-      } else if (sortKey === "priority") {
+      if (sortKey === "title") cmp = a.title.localeCompare(b.title);
+      else if (sortKey === "priority")
         cmp =
           (PRIORITY_ORDER[a.priority] ?? 99) -
           (PRIORITY_ORDER[b.priority] ?? 99);
-      } else if (sortKey === "status") {
-        cmp =
-          (STATUS_LIST.indexOf(a.status) ?? 0) -
-          (STATUS_LIST.indexOf(b.status) ?? 0);
-      } else if (sortKey === "due_date") {
+      else if (sortKey === "status")
+        cmp = STATUS_LIST.indexOf(a.status) - STATUS_LIST.indexOf(b.status);
+      else if (sortKey === "due_date") {
         const da = a.due_date ? new Date(a.due_date) : new Date("9999-12-31");
         const db = b.due_date ? new Date(b.due_date) : new Date("9999-12-31");
         cmp = da - db;
       } else {
-        // default: newest first (by createdAt)
         cmp = new Date(b.createdAt) - new Date(a.createdAt);
       }
       return sortAsc ? cmp : -cmp;
@@ -152,52 +160,11 @@ export default function Tasks() {
 
   // ── sort toggle ────────────────────────────────────────────────────────────
   const toggleSort = (key) => {
-    if (sortKey === key) {
-      setSortAsc((v) => !v);
-    } else {
+    if (sortKey === key) setSortAsc((v) => !v);
+    else {
       setSortKey(key);
       setSortAsc(true);
     }
-  };
-
-  const SortIcon = ({ col }) => {
-    if (sortKey !== col)
-      return (
-        <svg
-          className="h-3 w-3 text-gray-300 ml-1 inline"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8 9l4-4 4 4M8 15l4 4 4-4"
-          />
-        </svg>
-      );
-    return sortAsc ? (
-      <svg
-        className="h-3 w-3 text-blue-500 ml-1 inline"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-      </svg>
-    ) : (
-      <svg
-        className="h-3 w-3 text-blue-500 ml-1 inline"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-      </svg>
-    );
   };
 
   // ── create task ────────────────────────────────────────────────────────────
@@ -256,7 +223,6 @@ export default function Tasks() {
     setFilterPriority("");
     setFilterAssignee("");
   };
-
   const hasActiveFilter =
     search || filterStatus || filterPriority || filterAssignee;
 
@@ -265,25 +231,13 @@ export default function Tasks() {
     <div className="flex flex-col h-full">
       {/* ── Toolbar ── */}
       <div className="bg-white border-b border-gray-200 px-4 sm:px-5 py-3 flex-shrink-0">
-        {/* Row 1: back + title + add button */}
+        {/* Row 1: back + title + add */}
         <div className="flex items-center gap-3 mb-3">
           <button
             onClick={() => navigate("/projects")}
-            className="text-gray-400 hover:text-gray-600 text-sm flex-shrink-0 flex items-center gap-1"
+            className="text-gray-400 hover:text-gray-600 flex-shrink-0 flex items-center gap-1 text-sm"
           >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+            <ChevronLeftIcon className="h-4 w-4" />
             <span className="hidden sm:inline">Projects</span>
           </button>
           <h1 className="text-base font-semibold text-gray-900 flex-1 truncate">
@@ -294,19 +248,7 @@ export default function Tasks() {
               onClick={() => setShowCreate(true)}
               className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-2 rounded-lg transition-colors flex-shrink-0"
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
+              <PlusIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Add task</span>
               <span className="sm:hidden">Add</span>
             </button>
@@ -315,21 +257,8 @@ export default function Tasks() {
 
         {/* Row 2: search + filters */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Search */}
           <div className="relative flex-1 min-w-[160px] max-w-xs">
-            <svg
-              className="absolute left-2.5 top-2 h-3.5 w-3.5 text-gray-400 pointer-events-none"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            <MagnifyingGlassIcon className="absolute left-2.5 top-2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -338,7 +267,6 @@ export default function Tasks() {
             />
           </div>
 
-          {/* Status filter */}
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
@@ -352,7 +280,6 @@ export default function Tasks() {
             ))}
           </select>
 
-          {/* Priority filter */}
           <select
             value={filterPriority}
             onChange={(e) => setFilterPriority(e.target.value)}
@@ -366,7 +293,6 @@ export default function Tasks() {
             ))}
           </select>
 
-          {/* Assignee filter */}
           <select
             value={filterAssignee}
             onChange={(e) => setFilterAssignee(e.target.value)}
@@ -381,25 +307,12 @@ export default function Tasks() {
             ))}
           </select>
 
-          {/* Clear filters */}
           {hasActiveFilter && (
             <button
               onClick={clearFilters}
               className="text-xs text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"
             >
-              <svg
-                className="h-3.5 w-3.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <XMarkIcon className="h-3.5 w-3.5" />
               Clear
             </button>
           )}
@@ -440,49 +353,48 @@ export default function Tasks() {
           <table className="w-full table-fixed border-collapse">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr className="border-b border-gray-200">
-                {/* # — desktop only */}
                 <th className="hidden md:table-cell w-12 px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
                   #
                 </th>
-
-                {/* Title */}
                 <th
                   className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none hover:text-gray-700 w-auto"
                   onClick={() => toggleSort("title")}
                 >
-                  Title <SortIcon col="title" />
+                  Title{" "}
+                  <SortIcon col="title" sortKey={sortKey} sortAsc={sortAsc} />
                 </th>
-
-                {/* Status */}
                 <th
                   className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none hover:text-gray-700 w-32"
                   onClick={() => toggleSort("status")}
                 >
-                  Status <SortIcon col="status" />
+                  Status{" "}
+                  <SortIcon col="status" sortKey={sortKey} sortAsc={sortAsc} />
                 </th>
-
-                {/* Priority — desktop only */}
                 <th
                   className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none hover:text-gray-700 w-28"
                   onClick={() => toggleSort("priority")}
                 >
-                  Priority <SortIcon col="priority" />
+                  Priority{" "}
+                  <SortIcon
+                    col="priority"
+                    sortKey={sortKey}
+                    sortAsc={sortAsc}
+                  />
                 </th>
-
-                {/* Assignee — desktop only */}
                 <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide w-36">
                   Assignee
                 </th>
-
-                {/* Due date — desktop only */}
                 <th
                   className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none hover:text-gray-700 w-28"
                   onClick={() => toggleSort("due_date")}
                 >
-                  Due <SortIcon col="due_date" />
+                  Due{" "}
+                  <SortIcon
+                    col="due_date"
+                    sortKey={sortKey}
+                    sortAsc={sortAsc}
+                  />
                 </th>
-
-                {/* Actions — desktop only */}
                 {canManage && (
                   <th className="hidden md:table-cell w-16 px-4 py-3" />
                 )}
@@ -496,35 +408,25 @@ export default function Tasks() {
                   onClick={() => setSelectedTask(task)}
                   className="hover:bg-blue-50/40 cursor-pointer transition-colors group"
                 >
-                  {/* # */}
                   <td className="hidden md:table-cell px-4 py-3 text-xs text-gray-400 font-mono">
                     {idx + 1}
                   </td>
-
-                  {/* Title */}
                   <td className="px-4 py-3">
                     <p className="text-sm font-medium text-gray-900 truncate group-hover:text-blue-700 transition-colors">
                       {task.title}
                     </p>
-                    {/* Mobile: show assignee name below title */}
                     {task.assignee && (
                       <p className="md:hidden text-xs text-gray-400 mt-0.5 truncate">
                         {task.assignee.name}
                       </p>
                     )}
                   </td>
-
-                  {/* Status */}
                   <td className="px-4 py-3">
                     <StatusBadge status={task.status} />
                   </td>
-
-                  {/* Priority — desktop only */}
                   <td className="hidden md:table-cell px-4 py-3">
                     <PriorityBadge priority={task.priority} />
                   </td>
-
-                  {/* Assignee — desktop only */}
                   <td className="hidden md:table-cell px-4 py-3">
                     {task.assignee ? (
                       <div className="flex items-center gap-2">
@@ -536,11 +438,9 @@ export default function Tasks() {
                         </span>
                       </div>
                     ) : (
-                      <span className="text-xs text-gray-400">—</span>
+                      <span className="text-xs text-gray-300">—</span>
                     )}
                   </td>
-
-                  {/* Due date — desktop only */}
                   <td className="hidden md:table-cell px-4 py-3">
                     {task.due_date ? (
                       <span
@@ -556,8 +456,6 @@ export default function Tasks() {
                       <span className="text-xs text-gray-300">—</span>
                     )}
                   </td>
-
-                  {/* Actions — desktop only */}
                   {canManage && (
                     <td className="hidden md:table-cell px-4 py-3 text-right">
                       <button
@@ -565,22 +463,10 @@ export default function Tasks() {
                           e.stopPropagation();
                           setDeleteTarget(task);
                         }}
-                        className="opacity-0 group-hover:opacity-100 text-xs text-red-400 hover:text-red-600 transition-all"
+                        className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all"
                         title="Delete task"
                       >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
+                        <TrashIcon className="h-4 w-4" />
                       </button>
                     </td>
                   )}
