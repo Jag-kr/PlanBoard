@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { updateTask } from "../api/tasks";
 import { getMembers } from "../api/members";
 import { getActiveWorkspace } from "../utils/workspace";
+import { getUser } from "../utils/auth";
+import { hasRole } from "../utils/helpers";
 import { PriorityBadge, StatusBadge } from "./Badge";
 import CommentBox from "./CommentBox";
 import Modal from "./Modal";
@@ -16,10 +18,15 @@ import LoadingSpinner from "./LoadingSpinner";
 
 export default function TaskDrawer({ task, onClose, onUpdated }) {
   const activeWorkspace = getActiveWorkspace();
+  const currentUser = getUser();
   const [form, setForm] = useState(null);
   const [members, setMembers] = useState([]);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const canManage = hasRole(activeWorkspace?.role, "MANAGER");
+  const isAssignedMember = task?.assignee_id === currentUser?.id;
+  const canEditTask = canManage || isAssignedMember;
+  const canComment = canManage || isAssignedMember;
 
   useEffect(() => {
     if (!task) return;
@@ -44,12 +51,13 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
   if (!task) return null;
 
   const change = (field) => (e) => {
+    if (!canEditTask) return;
     setForm((f) => ({ ...f, [field]: e.target.value }));
     setDirty(true);
   };
 
   const handleSave = async () => {
-    if (!dirty) return;
+    if (!dirty || !canEditTask) return;
     setSaving(true);
     try {
       const payload = {
@@ -89,7 +97,7 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
             <StatusBadge status={form.status} />
             <PriorityBadge priority={form.priority} />
           </div>
-          {dirty && (
+          {canEditTask && dirty && (
             <button
               onClick={handleSave}
               disabled={saving}
@@ -100,13 +108,20 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
           )}
         </div>
 
+        {!canEditTask && (
+          <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-700">
+            Members may only edit tasks assigned to them.
+          </div>
+        )}
+
         {/* Body */}
         <div className="flex-1 overflow-y-auto space-y-5">
           {/* Title */}
           <input
             value={form.title}
             onChange={change("title")}
-            className="w-full text-lg font-semibold text-gray-900 border-0 border-b border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none py-1 transition-colors"
+            disabled={!canEditTask}
+            className="w-full text-lg font-semibold text-gray-900 border-0 border-b border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none py-1 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           />
 
           {/* Meta grid */}
@@ -119,7 +134,8 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
               <select
                 value={form.status}
                 onChange={change("status")}
-                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={!canEditTask}
+                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {STATUS_LIST.map((s) => (
                   <option key={s} value={s}>
@@ -137,7 +153,8 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
               <select
                 value={form.priority}
                 onChange={change("priority")}
-                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={!canEditTask}
+                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {PRIORITY_LIST.map((p) => (
                   <option key={p} value={p}>
@@ -155,7 +172,8 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
               <select
                 value={form.assignee_id}
                 onChange={change("assignee_id")}
-                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={!canManage}
+                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <option value="">Unassigned</option>
                 {members.map((m) => (
@@ -175,7 +193,8 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
                 type="date"
                 value={form.due_date}
                 onChange={change("due_date")}
-                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={!canEditTask}
+                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
               />
             </div>
           </div>
@@ -190,7 +209,8 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
               value={form.description}
               onChange={change("description")}
               placeholder="Add a description…"
-              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={!canEditTask}
+              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
             />
           </div>
 
@@ -209,7 +229,12 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
           <hr className="border-gray-100" />
 
           {/* Comments */}
-          <CommentBox taskId={task.id} workspaceId={activeWorkspace?.id} />
+          {!canComment && (
+            <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-700">
+              Members may only comment on tasks assigned to them.
+            </div>
+          )}
+          <CommentBox taskId={task.id} canComment={canComment} />
         </div>
       </div>
     </Modal>

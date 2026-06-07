@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getTasks, createTask, updateTask, deleteTask } from "../api/tasks";
 import { getMembers } from "../api/members";
 import { getActiveWorkspace } from "../utils/workspace";
+import { getUser } from "../utils/auth";
 import KanbanBoard from "../components/KanbanBoard";
 import TaskDrawer from "../components/TaskDrawer";
 import Modal from "../components/Modal";
@@ -16,7 +17,10 @@ export default function Board() {
   const activeWorkspace = getActiveWorkspace();
   const navigate = useNavigate();
 
+  const currentUser = getUser();
   const canManage = hasRole(activeWorkspace?.role, "MANAGER");
+  const canEditTask = (task) =>
+    canManage || task.assignee_id === currentUser?.id;
 
   const [tasks, setTasks] = useState([]);
   const [members, setMembers] = useState([]);
@@ -175,6 +179,7 @@ export default function Board() {
           tasks={tasks}
           onTaskClick={setSelectedTask}
           onStatusChange={handleStatusChange}
+          canDragTask={canEditTask}
         />
       </div>
 

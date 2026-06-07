@@ -2,7 +2,12 @@ import { useState, useCallback } from "react";
 import TaskCard from "./TaskCard";
 import { KANBAN_COLUMNS } from "../utils/constants";
 
-export default function KanbanBoard({ tasks, onTaskClick, onStatusChange }) {
+export default function KanbanBoard({
+  tasks,
+  onTaskClick,
+  onStatusChange,
+  canDragTask,
+}) {
   const [draggedTask, setDraggedTask] = useState(null);
   const [dragOverCol, setDragOverCol] = useState(null);
 
@@ -80,8 +85,11 @@ export default function KanbanBoard({ tasks, onTaskClick, onStatusChange }) {
                     <TaskCard
                       task={task}
                       onClick={onTaskClick}
-                      onDragStart={handleDragStart}
+                      onDragStart={
+                        canDragTask?.(task) ? handleDragStart : undefined
+                      }
                       onDragEnd={handleDragEnd}
+                      isDraggable={canDragTask?.(task)}
                     />
                   </div>
                 ))

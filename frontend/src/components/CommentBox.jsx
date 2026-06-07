@@ -6,7 +6,7 @@ import { timeAgo } from "../utils/helpers";
 import { toastError } from "../utils/toast";
 import LoadingSpinner from "./LoadingSpinner";
 
-export default function CommentBox({ taskId }) {
+export default function CommentBox({ taskId, canComment = true }) {
   const user = getUser();
   const [comments, setComments] = useState([]);
   const [body, setBody] = useState("");
@@ -32,7 +32,7 @@ export default function CommentBox({ taskId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!body.trim()) return;
+    if (!body.trim() || !canComment) return;
     setPosting(true);
     try {
       await createComment(taskId, { body: body.trim() });
@@ -109,13 +109,18 @@ export default function CommentBox({ taskId }) {
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey))
                 handleSubmit(e);
             }}
-            placeholder="Write a comment… (Ctrl+Enter to submit)"
-            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder={
+              canComment
+                ? "Write a comment… (Ctrl+Enter to submit)"
+                : "You can only comment on tasks assigned to you."
+            }
+            disabled={!canComment}
+            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
           />
           <div className="flex justify-end mt-1">
             <button
               type="submit"
-              disabled={posting || !body.trim()}
+              disabled={posting || !body.trim() || !canComment}
               className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 transition-colors"
             >
               {posting ? "Posting…" : "Comment"}

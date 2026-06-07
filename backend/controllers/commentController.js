@@ -63,6 +63,14 @@ const createComment = async (req, res, next) => {
         .status(403)
         .json({ error: "You are not a member of this workspace." });
 
+    const isPrivileged = hasRoleLevel(member.role, "MANAGER");
+    if (!isPrivileged && task.assignee_id !== req.user.id) {
+      return res.status(403).json({
+        error:
+          "Insufficient permissions. Members can only comment on tasks assigned to them.",
+      });
+    }
+
     const comment = await Comment.create({
       task_id: taskId,
       user_id: req.user.id,
