@@ -16,6 +16,8 @@ export default function Board() {
   const { activeWorkspace } = useWorkspace();
   const navigate = useNavigate();
 
+  const canManage = hasRole(activeWorkspace?.role, "MANAGER");
+
   const [tasks, setTasks] = useState([]);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,11 +53,11 @@ export default function Board() {
   }, []);
 
   useEffect(() => {
-    if (!activeWorkspace) return;
+    if (!activeWorkspace || !canManage) return;
     getMembers(activeWorkspace.id)
       .then((r) => setMembers(r.data.members || []))
       .catch(() => {});
-  }, [activeWorkspace, activeWorkspace?.id]);
+  }, [activeWorkspace, activeWorkspace?.id, canManage]);
 
   const handleStatusChange = async (task, newStatus) => {
     try {
@@ -157,12 +159,14 @@ export default function Board() {
           </svg>
         </div>
 
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-2 rounded-lg transition-colors"
-        >
-          <span>＋</span> Add task
-        </button>
+        {canManage && (
+          <button
+            onClick={() => setShowCreate(true)}
+            className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-2 rounded-lg transition-colors"
+          >
+            <span>＋</span> Add task
+          </button>
+        )}
       </div>
 
       {/* Kanban */}

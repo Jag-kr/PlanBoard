@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useWorkspace } from "../context/WorkspaceContext";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -21,6 +22,7 @@ const ROLES = ["ADMIN", "MANAGER", "MEMBER"];
 export default function Members() {
   const { activeWorkspace } = useWorkspace();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showInvite, setShowInvite] = useState(false);
@@ -32,6 +34,13 @@ export default function Members() {
   const myRole = activeWorkspace?.role;
   const canAdmin = hasRole(myRole, "ADMIN");
   const canInvite = hasRole(myRole, "MANAGER");
+
+  // Page-level guard — redirect if insufficient role
+  useEffect(() => {
+    if (activeWorkspace && !hasRole(activeWorkspace.role, "MANAGER")) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [activeWorkspace?.role]);
 
   const fetchMembers = async () => {
     if (!activeWorkspace) return;

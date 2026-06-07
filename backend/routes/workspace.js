@@ -149,7 +149,11 @@ router.get(
  *       200:
  *         description: Array of members with role and user info
  */
-router.get("/:workspaceId/members", memberController.getMembers);
+router.get(
+  "/:workspaceId/members",
+  requireRole("MANAGER"),
+  memberController.getMembers,
+);
 
 /**
  * @swagger

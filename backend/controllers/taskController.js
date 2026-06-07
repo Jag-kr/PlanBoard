@@ -73,8 +73,16 @@ const createTask = async (req, res, next) => {
         .status(403)
         .json({ error: "You are not a member of this workspace." });
 
-    // Only MANAGER+ can assign tasks to others
+    // Only MANAGER+ can create tasks
     const canAssign = hasRoleLevel(member.role, "MANAGER");
+    if (!canAssign) {
+      return res.status(403).json({
+        error:
+          "Insufficient permissions. Only Managers and Admins can create tasks.",
+      });
+    }
+
+    // Only MANAGER+ can assign tasks to others
     if (assignee_id && !canAssign) {
       return res.status(403).json({
         error:

@@ -1,14 +1,22 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWorkspace } from "../context/WorkspaceContext";
-import { getProjects, createProject, deleteProject } from "../api/projects";
+import {
+  getProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+} from "../api/projects";
 import Modal from "../components/Modal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { StatusBadge } from "../components/Badge";
+import { ProjectStatusBadge } from "../components/Badge";
 import { toastError, toastSuccess } from "../utils/toast";
 import { hasRole } from "../utils/helpers";
+import { PROJECT_STATUS_LIST } from "../utils/constants";
+
+const STATUS_OPTIONS = PROJECT_STATUS_LIST;
 
 export default function Projects() {
   const { activeWorkspace } = useWorkspace();
@@ -20,8 +28,14 @@ export default function Projects() {
   const [creating, setCreating] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [editTarget, setEditTarget] = useState(null); // project being status-edited
+  const [editStatus, setEditStatus] = useState("");
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
-  const canManage = hasRole(activeWorkspace?.role, "MANAGER");
+  const userRole = activeWorkspace?.role;
+  const canCreate = hasRole(userRole, "MANAGER"); // MANAGER + ADMIN can create
+  const canUpdate = hasRole(userRole, "MANAGER"); // MANAGER + ADMIN can update status
+  const canDelete = hasRole(userRole, "ADMIN"); // Only ADMIN can delete
 
   const fetchProjects = async () => {
     if (!activeWorkspace) return;
@@ -57,6 +71,27 @@ export default function Projects() {
     }
   };
 
+  const handleStatusUpdate = async (e) => {
+    e.preventDefault();
+    setUpdatingStatus(true);
+    try {
+      const res = await updateProject(editTarget.id, { status: editStatus });
+      setProjects((p) =>
+        p.map((pr) =>
+          pr.id === editTarget.id
+            ? { ...pr, status: res.data.project.status }
+            : pr,
+        ),
+      );
+      setEditTarget(null);
+      toastSuccess("Project status updated.");
+    } catch (err) {
+      toastError(err.response?.data?.error || "Failed to update project.");
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+
   const handleDelete = async () => {
     setDeleting(true);
     try {
@@ -83,7 +118,7 @@ export default function Projects() {
             {projects.length} project{projects.length !== 1 ? "s" : ""}
           </p>
         </div>
-        {canManage && (
+        {canCreate && (
           <button
             onClick={() => setShowModal(true)}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
@@ -102,12 +137,12 @@ export default function Projects() {
           icon="📁"
           title="No projects yet"
           description={
-            canManage
+            canCreate
               ? "Create your first project to get started."
               : "Ask an admin or manager to create a project."
           }
           action={
-            canManage && (
+            canCreate && (
               <button
                 onClick={() => setShowModal(true)}
                 className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
@@ -129,7 +164,7 @@ export default function Projects() {
                 <div className="h-10 w-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg font-bold">
                   {project.name[0].toUpperCase()}
                 </div>
-                <StatusBadge status={project.status} />
+                <ProjectStatusBadge status={project.status} />
               </div>
               <h3 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
                 {project.name}
@@ -144,17 +179,33 @@ export default function Projects() {
                   {project.taskCount ?? 0} task
                   {project.taskCount !== 1 ? "s" : ""}
                 </span>
-                {canManage && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteTarget(project);
-                    }}
-                    className="text-xs text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    Delete
-                  </button>
-                )}
+                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* Update status — MANAGER+ */}
+                  {canUpdate && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditTarget(project);
+                        setEditStatus(project.status);
+                      }}
+                      className="text-xs text-blue-500 hover:text-blue-700"
+                    >
+                      Edit status
+                    </button>
+                  )}
+                  {/* Delete — ADMIN only */}
+                  {canDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteTarget(project);
+                      }}
+                      className="text-xs text-red-400 hover:text-red-600"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -209,6 +260,67 @@ export default function Projects() {
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
             >
               {creating ? "Creating…" : "Create project"}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit status modal */}
+      <Modal
+        isOpen={!!editTarget}
+        onClose={() => setEditTarget(null)}
+        title={`Update status — ${editTarget?.name}`}
+        size="sm"
+      >
+        <form onSubmit={handleStatusUpdate} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Project status
+            </label>
+            <div className="flex flex-col gap-2">
+              {STATUS_OPTIONS.map((s) => (
+                <label
+                  key={s}
+                  className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors ${
+                    editStatus === s
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="status"
+                    value={s}
+                    checked={editStatus === s}
+                    onChange={() => setEditStatus(s)}
+                    className="accent-blue-600"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800">{s}</p>
+                    <p className="text-xs text-gray-500">
+                      {s === "ACTIVE"
+                        ? "Project is active and accepting tasks"
+                        : "Project is archived and read-only"}
+                    </p>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-3 justify-end">
+            <button
+              type="button"
+              onClick={() => setEditTarget(null)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={updatingStatus || editStatus === editTarget?.status}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+            >
+              {updatingStatus ? "Saving…" : "Update status"}
             </button>
           </div>
         </form>

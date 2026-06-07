@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useWorkspace } from "../context/WorkspaceContext";
 import { updateWorkspace } from "../api/workspaces";
 import { toastError, toastSuccess } from "../utils/toast";
@@ -6,10 +7,18 @@ import { hasRole } from "../utils/helpers";
 
 export default function Settings() {
   const { activeWorkspace, updateActiveWorkspace } = useWorkspace();
+  const navigate = useNavigate();
   const isAdmin = hasRole(activeWorkspace?.role, "ADMIN");
 
   const [name, setName] = useState(activeWorkspace?.name || "");
   const [saving, setSaving] = useState(false);
+
+  // Page-level guard — redirect non-Admins away
+  useEffect(() => {
+    if (activeWorkspace && !isAdmin) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [activeWorkspace?.role]);
 
   // Sync if workspace changes
   if (activeWorkspace && name !== activeWorkspace.name && !saving) {

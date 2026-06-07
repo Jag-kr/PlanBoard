@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { useWorkspace } from "./context/WorkspaceContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -99,9 +100,11 @@ export default function App() {
           path="/members"
           element={
             <ProtectedRoute>
-              <AppShell>
-                <Members />
-              </AppShell>
+              <RoleProtectedRoute minRole="MANAGER">
+                <AppShell>
+                  <Members />
+                </AppShell>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -109,9 +112,11 @@ export default function App() {
           path="/settings"
           element={
             <ProtectedRoute>
-              <AppShell>
-                <Settings />
-              </AppShell>
+              <RoleProtectedRoute minRole="ADMIN">
+                <AppShell>
+                  <Settings />
+                </AppShell>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />

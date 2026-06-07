@@ -1,4 +1,4 @@
-// Status display labels and colours
+// Status display labels and colours (for Tasks)
 export const STATUS_CONFIG = {
   TODO: {
     label: "To Do",
@@ -23,6 +23,22 @@ export const STATUS_CONFIG = {
 };
 
 export const STATUS_LIST = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
+
+// Project status config (separate from task statuses)
+export const PROJECT_STATUS_CONFIG = {
+  ACTIVE: {
+    label: "Active",
+    color: "bg-emerald-100 text-emerald-700",
+    dot: "bg-emerald-500",
+  },
+  ARCHIVED: {
+    label: "Archived",
+    color: "bg-gray-100 text-gray-500",
+    dot: "bg-gray-400",
+  },
+};
+
+export const PROJECT_STATUS_LIST = ["ACTIVE", "ARCHIVED"];
 
 // Priority display labels and colours
 export const PRIORITY_CONFIG = {
