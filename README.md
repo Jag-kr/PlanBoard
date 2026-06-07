@@ -9,7 +9,6 @@
 | Database | PostgreSQL 16                                   |
 | Auth     | JWT (localStorage)                              |
 | Email    | Nodemailer + Gmail App Password                 |
-| API Docs | Swagger UI at `/api/docs`                       |
 | Deploy   | Render (Static Site + Web Service + Managed DB) |
 
 ---
@@ -37,7 +36,6 @@ PlanBoard/
 │   ├── models/             # User, Workspace, Project, Task, …
 │   ├── routes/
 │   ├── services/           # mailerService.js
-│   ├── swagger.js
 │   ├── server.js
 │   └── .env.example
 │
@@ -86,8 +84,7 @@ psql -U postgres -c "CREATE DATABASE planboard;"
 # Install dependencies and start (auto-syncs DB schema on first run)
 npm install
 npm run dev
-# → API running at http://localhost:5000
-# → Swagger docs at http://localhost:5000/api/docs
+# → API running at http://localhost:3001
 ```
 
 ### 3. Set up the frontend
@@ -105,12 +102,11 @@ npm run dev
 
 ### Local URLs
 
-| Service            | URL                            |
-| ------------------ | ------------------------------ |
-| Frontend           | http://localhost:3000          |
-| Backend API        | http://localhost:5000          |
-| API Docs (Swagger) | http://localhost:5000/api/docs |
-| Health check       | http://localhost:5000/health   |
+| Service      | URL                          |
+| ------------ | ---------------------------- |
+| Frontend     | http://localhost:3000        |
+| Backend API  | http://localhost:3001        |
+| Health check | http://localhost:3001/health |
 
 ---
 
@@ -207,8 +203,6 @@ Trigger a redeploy.
 
 ## API Overview
 
-Full interactive docs at `/api/docs` (Swagger UI).
-
 | Method | Endpoint                              | Auth | Min Role |
 | ------ | ------------------------------------- | :--: | -------- |
 | POST   | `/api/auth/signup`                    |  No  | —        |
@@ -228,14 +222,13 @@ Full interactive docs at `/api/docs` (Swagger UI).
 | DELETE | `/api/projects/:id`                   | JWT  | MANAGER  |
 | GET    | `/api/projects/:id/tasks`             | JWT  | MEMBER   |
 | POST   | `/api/projects/:id/tasks`             | JWT  | MANAGER  |
-| PATCH  | `/api/tasks/:id`                      | JWT  | MEMBER*  |
+| PATCH  | `/api/tasks/:id`                      | JWT  | MEMBER\* |
 | DELETE | `/api/tasks/:id`                      | JWT  | MANAGER  |
 | GET    | `/api/tasks/:id/comments`             | JWT  | MEMBER   |
-| POST   | `/api/tasks/:id/comments`             | JWT  | MEMBER*  |
+| POST   | `/api/tasks/:id/comments`             | JWT  | MEMBER\* |
 | DELETE | `/api/comments/:id`                   | JWT  | MEMBER\* |
 
-* Members can only update or comment on tasks assigned to them.
-\* Own comments only; MANAGER+ can delete any.
+- Members can only update or comment on tasks assigned to them. \* Own comments only; MANAGER+ can delete any.
 
 ---
 
@@ -249,7 +242,6 @@ Full interactive docs at `/api/docs` (Swagger UI).
 - 💬 **Comments** — live comment threads with Ctrl+Enter to post
 - 📊 **Dashboard** — stat cards, My Tasks, Recent Activity feed
 - 📧 **Invitations** — styled HTML email invites via Nodemailer + Gmail
-- 📖 **API Docs** — Swagger UI with persistent bearer auth at `/api/docs`
 - 🏥 **Health check** — `GET /health` for uptime monitoring
 
 ---
@@ -263,7 +255,7 @@ Full interactive docs at `/api/docs` (Swagger UI).
 | Create / delete projects |  ✅   |   ✅    |   ❌   |
 | Create / assign tasks    |  ✅   |   ✅    |   ❌   |
 | Delete any task          |  ✅   |   ✅    |   ❌   |
-| Comment on tasks         |  ✅   |   ✅    |   ✅*  |
+| Comment on tasks         |  ✅   |   ✅    |  ✅\*  |
 | Delete own comments      |  ✅   |   ✅    |   ✅   |
 
-* Members can only edit or comment on tasks assigned to them.
+- Members can only edit or comment on tasks assigned to them.

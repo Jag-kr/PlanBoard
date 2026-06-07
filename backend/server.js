@@ -1,8 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const swaggerUi = require("swagger-ui-express");
-const swaggerSpec = require("./swagger");
+
 const { sequelize } = require("./models");
 const errorHandler = require("./middleware/errorHandler");
 
@@ -32,23 +31,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// ── Swagger API docs ───────────────────────────────────────────────────────
-app.use(
-  "/api/docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, {
-    customSiteTitle: "PlanBoard API Docs",
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  }),
-);
 
-// Serve raw OpenAPI spec as JSON
-app.get("/api/docs.json", (req, res) => {
-  res.setHeader("Content-Type", "application/json");
-  res.send(swaggerSpec);
-});
 
 // ── API routes ─────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
@@ -79,7 +62,7 @@ const start = async () => {
 
     app.listen(PORT, () => {
       console.log(`[Server] Running on port ${PORT}`);
-      console.log(`[Docs]   http://localhost:${PORT}/api/docs`);
+
     });
   } catch (err) {
     console.error("[DB] Failed to connect or sync:", err.message);

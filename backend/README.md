@@ -1,6 +1,6 @@
 # PlanBoard Server
 
-REST API backend for the PlanBoard project management platform. Built with Node.js, Express, PostgreSQL (Sequelize), and Swagger.
+REST API backend for the PlanBoard project management platform. Built with Node.js, Express, and PostgreSQL (Sequelize).
 
 ---
 
@@ -65,23 +65,6 @@ The server will sync the database schema automatically on startup and then liste
 [DB] Connection established successfully.
 [DB] Models synchronised.
 [Server] Running on port 5000
-[Docs]   http://localhost:5000/api/docs
-```
-
----
-
-## API Documentation
-
-Interactive Swagger UI is available once the server is running:
-
-```
-http://localhost:5000/api/docs
-```
-
-Raw OpenAPI JSON spec:
-
-```
-http://localhost:5000/api/docs.json
 ```
 
 ---
@@ -114,7 +97,7 @@ backend/
 │   ├── Project.js
 │   ├── Task.js
 │   └── Comment.js
-├── routes/                # Express routers with Swagger JSDoc
+├── routes/                # Express routers
 │   ├── auth.js
 │   ├── workspace.js
 │   ├── invitation.js
@@ -126,8 +109,7 @@ backend/
 ├── .env.example
 ├── .gitignore
 ├── package.json
-├── server.js              # App entry point
-└── swagger.js             # OpenAPI 3.0 spec config
+└── server.js              # App entry point
 ```
 
 ---
