@@ -10,6 +10,7 @@ import LoadingSpinner from "./components/LoadingSpinner";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import AcceptInvite from "./pages/AcceptInvite";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
@@ -70,6 +71,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/invite/:token" element={<AcceptInvite />} />
 
         <Route
           path="/onboarding"

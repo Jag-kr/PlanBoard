@@ -19,8 +19,7 @@ const sendInvitationEmail = async (to, token, workspaceName, inviterName) => {
     );
     return;
   }
-
-  const inviteUrl = `${process.env.CLIENT_URL}/signup?invite=${token}`;
+  const inviteUrl = `${process.env.CLIENT_URL}/invite/${token}`;
 
   const html = `
     <!DOCTYPE html>
