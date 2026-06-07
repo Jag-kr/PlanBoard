@@ -116,7 +116,7 @@ export default function Members() {
         {canInvite && (
           <button
             onClick={() => setShowInvite(true)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
+            className="flex items-center gap-2 bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl"
           >
             ✉ Invite member
           </button>
@@ -150,7 +150,7 @@ export default function Members() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {members.map((m) => (
-                  <tr key={m.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={m.id} className="bg-gray-50">
                     <td className="px-4 sm:px-5 py-3">
                       <div className="flex items-center gap-2 sm:gap-3">
                         <Avatar name={m.name} size="md" />
@@ -193,7 +193,7 @@ export default function Members() {
                         {m.userId !== user?.id && (
                           <button
                             onClick={() => setRemoveTarget(m)}
-                            className="text-xs text-red-400 hover:text-red-600 transition-colors"
+                            className="text-xs text-red-600"
                           >
                             Remove
                           </button>
@@ -254,14 +254,14 @@ export default function Members() {
             <button
               type="button"
               onClick={() => setShowInvite(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={inviting || !inviteForm.email.trim()}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg disabled:opacity-50"
             >
               {inviting ? "Sending…" : "Send invite"}
             </button>

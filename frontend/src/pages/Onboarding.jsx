@@ -59,7 +59,7 @@ export default function Onboarding() {
             <button
               type="submit"
               disabled={loading || !name.trim()}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50"
+              className="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl disabled:opacity-50"
             >
               {loading ? "Creating workspace…" : "Create workspace →"}
             </button>

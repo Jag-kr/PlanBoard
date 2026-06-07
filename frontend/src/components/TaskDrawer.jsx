@@ -101,7 +101,7 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 transition-colors"
+              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save"}
             </button>
@@ -121,7 +121,7 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
             value={form.title}
             onChange={change("title")}
             disabled={!canEditTask}
-            className="w-full text-lg font-semibold text-gray-900 border-0 border-b border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none py-1 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full text-lg font-semibold text-gray-900 border-0 border-b border-gray-200 focus:border-blue-400 focus:outline-none py-1 disabled:cursor-not-allowed disabled:opacity-60"
           />
 
           {/* Meta grid */}

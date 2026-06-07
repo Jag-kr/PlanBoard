@@ -123,7 +123,7 @@ export default function Dashboard() {
               {stats?.myTasks?.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
                 >
                   <PriorityBadge priority={task.priority} />
                   <span className="text-sm font-medium text-gray-800 flex-1 truncate">
@@ -161,7 +161,7 @@ export default function Dashboard() {
               {stats?.recentActivity?.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
                 >
                   {task.assignee && (
                     <Avatar name={task.assignee.name} size="sm" />

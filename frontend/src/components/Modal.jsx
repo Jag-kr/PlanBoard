@@ -50,7 +50,7 @@ export default function Modal({
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors text-xl leading-none"
+              className="text-gray-600 text-xl leading-none"
               aria-label="Close modal"
             >
               ×

@@ -83,7 +83,7 @@ export default function CommentBox({ taskId, canComment = true }) {
                 {c.user_id === user?.id && (
                   <button
                     onClick={() => handleDelete(c.id)}
-                    className="ml-auto text-xs text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="ml-auto text-xs text-red-600 opacity-100"
                   >
                     Delete
                   </button>
@@ -121,7 +121,7 @@ export default function CommentBox({ taskId, canComment = true }) {
             <button
               type="submit"
               disabled={posting || !body.trim() || !canComment}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 transition-colors"
+              className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg disabled:opacity-50"
             >
               {posting ? "Posting…" : "Comment"}
             </button>

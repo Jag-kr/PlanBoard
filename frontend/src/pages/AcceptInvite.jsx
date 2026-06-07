@@ -97,7 +97,7 @@ export default function AcceptInvite() {
           </div>
           <Link
             to="/dashboard"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors"
+            className="inline-block bg-blue-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl"
           >
             Go to dashboard
           </Link>
@@ -198,7 +198,7 @@ export default function AcceptInvite() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-60 text-sm"
+              className="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-xl disabled:opacity-60 text-sm"
             >
               {submitting ? "Signing in…" : "Sign in & accept invite"}
             </button>
@@ -210,7 +210,7 @@ export default function AcceptInvite() {
               Don&apos;t have an account?{" "}
               <Link
                 to={`/signup?invite=${token}`}
-                className="text-blue-600 hover:underline font-medium"
+                className="text-blue-600 underline font-medium"
               >
                 Create one
               </Link>

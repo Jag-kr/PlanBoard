@@ -235,7 +235,7 @@ export default function Tasks() {
         <div className="flex items-center gap-3 mb-3">
           <button
             onClick={() => navigate("/projects")}
-            className="text-gray-400 hover:text-gray-600 flex-shrink-0 flex items-center gap-1 text-sm"
+            className="text-gray-600 flex-shrink-0 flex items-center gap-1 text-sm"
           >
             <ChevronLeftIcon className="h-4 w-4" />
             <span className="hidden sm:inline">Projects</span>
@@ -246,7 +246,7 @@ export default function Tasks() {
           {canManage && (
             <button
               onClick={() => setShowCreate(true)}
-              className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-2 rounded-lg transition-colors flex-shrink-0"
+              className="flex items-center gap-1.5 bg-blue-600 text-white text-sm font-semibold px-3 py-2 rounded-lg flex-shrink-0"
             >
               <PlusIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Add task</span>
@@ -310,7 +310,7 @@ export default function Tasks() {
           {hasActiveFilter && (
             <button
               onClick={clearFilters}
-              className="text-xs text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"
+              className="text-xs text-red-500 flex items-center gap-1"
             >
               <XMarkIcon className="h-3.5 w-3.5" />
               Clear
@@ -341,7 +341,7 @@ export default function Tasks() {
                 hasActiveFilter ? (
                   <button
                     onClick={clearFilters}
-                    className="text-sm text-blue-600 hover:underline"
+                    className="text-sm text-blue-600 underline"
                   >
                     Clear filters
                   </button>
@@ -357,21 +357,21 @@ export default function Tasks() {
                   #
                 </th>
                 <th
-                  className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none hover:text-gray-700 w-auto"
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none text-gray-700 w-auto"
                   onClick={() => toggleSort("title")}
                 >
                   Title{" "}
                   <SortIcon col="title" sortKey={sortKey} sortAsc={sortAsc} />
                 </th>
                 <th
-                  className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none hover:text-gray-700 w-32"
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none text-gray-700 w-32"
                   onClick={() => toggleSort("status")}
                 >
                   Status{" "}
                   <SortIcon col="status" sortKey={sortKey} sortAsc={sortAsc} />
                 </th>
                 <th
-                  className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none hover:text-gray-700 w-28"
+                  className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none text-gray-700 w-28"
                   onClick={() => toggleSort("priority")}
                 >
                   Priority{" "}
@@ -385,7 +385,7 @@ export default function Tasks() {
                   Assignee
                 </th>
                 <th
-                  className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none hover:text-gray-700 w-28"
+                  className="hidden md:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none text-gray-700 w-28"
                   onClick={() => toggleSort("due_date")}
                 >
                   Due{" "}
@@ -406,13 +406,13 @@ export default function Tasks() {
                 <tr
                   key={task.id}
                   onClick={() => setSelectedTask(task)}
-                  className="hover:bg-blue-50/40 cursor-pointer transition-colors group"
+                  className="bg-white cursor-pointer group"
                 >
                   <td className="hidden md:table-cell px-4 py-3 text-xs text-gray-400 font-mono">
                     {idx + 1}
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-sm font-medium text-gray-900 truncate group-hover:text-blue-700 transition-colors">
+                    <p className="text-sm font-medium text-gray-900 truncate">
                       {task.title}
                     </p>
                     {task.assignee && (
@@ -463,7 +463,7 @@ export default function Tasks() {
                           e.stopPropagation();
                           setDeleteTarget(task);
                         }}
-                        className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all"
+                        className="opacity-100 text-red-600"
                         title="Delete task"
                       >
                         <TrashIcon className="h-4 w-4" />
@@ -584,14 +584,14 @@ export default function Tasks() {
             <button
               type="button"
               onClick={() => setShowCreate(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={creating || !newTask.title.trim()}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg disabled:opacity-50"
             >
               {creating ? "Creating…" : "Create task"}
             </button>

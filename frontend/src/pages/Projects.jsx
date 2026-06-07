@@ -123,7 +123,7 @@ export default function Projects() {
         {canCreate && (
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
+            className="flex items-center gap-2 bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl"
           >
             <span className="text-base">＋</span> New project
           </button>
@@ -147,7 +147,7 @@ export default function Projects() {
             canCreate && (
               <button
                 onClick={() => setShowModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
+                className="bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl"
               >
                 Create project
               </button>
@@ -159,7 +159,7 @@ export default function Projects() {
           {projects.map((project) => (
             <div
               key={project.id}
-              className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 p-5 cursor-pointer transition-all group"
+              className="bg-white rounded-xl border border-blue-200 shadow-md p-5 cursor-pointer group"
               onClick={() => navigate(`/projects/${project.id}`)}
             >
               <div className="flex items-start justify-between mb-3">
@@ -168,7 +168,7 @@ export default function Projects() {
                 </div>
                 <ProjectStatusBadge status={project.status} />
               </div>
-              <h3 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+              <h3 className="font-semibold text-gray-900">
                 {project.name}
               </h3>
               {project.description && (
@@ -181,7 +181,7 @@ export default function Projects() {
                   {project.taskCount ?? 0} task
                   {project.taskCount !== 1 ? "s" : ""}
                 </span>
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-2 opacity-100">
                   {/* Update status — MANAGER+ */}
                   {canUpdate && (
                     <button
@@ -190,7 +190,7 @@ export default function Projects() {
                         setEditTarget(project);
                         setEditStatus(project.status);
                       }}
-                      className="text-xs text-blue-500 hover:text-blue-700"
+                      className="text-xs text-blue-700"
                     >
                       Edit status
                     </button>
@@ -202,7 +202,7 @@ export default function Projects() {
                         e.stopPropagation();
                         setDeleteTarget(project);
                       }}
-                      className="text-xs text-red-400 hover:text-red-600"
+                      className="text-xs text-red-600"
                     >
                       Delete
                     </button>
@@ -252,14 +252,14 @@ export default function Projects() {
             <button
               type="button"
               onClick={() => setShowModal(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={creating || !form.name.trim()}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg disabled:opacity-50"
             >
               {creating ? "Creating…" : "Create project"}
             </button>
@@ -286,7 +286,7 @@ export default function Projects() {
                   className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors ${
                     editStatus === s
                       ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                      : "border-gray-300"
                   }`}
                 >
                   <input
@@ -313,14 +313,14 @@ export default function Projects() {
             <button
               type="button"
               onClick={() => setEditTarget(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={updatingStatus || editStatus === editTarget?.status}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg disabled:opacity-50"
             >
               {updatingStatus ? "Saving…" : "Update status"}
             </button>

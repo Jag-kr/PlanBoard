@@ -94,7 +94,7 @@ export default function Settings() {
                 disabled={
                   saving || !name.trim() || name === activeWorkspace.name
                 }
-                className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl disabled:opacity-50 transition-colors"
+                className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl disabled:opacity-50"
               >
                 {saving ? "Saving…" : "Save changes"}
               </button>
