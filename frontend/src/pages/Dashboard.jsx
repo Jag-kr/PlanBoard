@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
-import { getActiveWorkspace } from "../utils/workspace";
-import { getWorkspaceStats } from "../api/workspaces";
-import { PriorityBadge, StatusBadge } from "../components/Badge";
+
 import Avatar from "../components/Avatar";
-import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
-import { formatDate, isOverdue, timeAgo } from "../utils/helpers";
+import TaskDrawer from "../components/TaskDrawer";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { PriorityBadge, StatusBadge } from "../components/Badge";
+
 import { toastError } from "../utils/toast";
+import { getActiveWorkspace } from "../utils/workspace";
+import { formatDate, isOverdue, timeAgo } from "../utils/helpers";
+
+import { getWorkspaceStats } from "../api/workspaces";
 
 export default function Dashboard() {
   const activeWorkspace = getActiveWorkspace();
+
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedTask, setSelectedTask] = useState(null);
 
   const fetchStats = async () => {
     if (!activeWorkspace) return;
@@ -28,6 +34,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkspace?.id]);
 
   if (!activeWorkspace)
@@ -79,6 +86,20 @@ export default function Dashboard() {
     },
   ];
 
+  const handleTaskUpdated = (updated) => {
+    setStats((prev) => {
+      if (!prev) return prev;
+      const myTasks = prev.myTasks.map((t) =>
+        t.id === updated.id ? updated : t,
+      );
+      const recentActivity = prev.recentActivity.map((t) =>
+        t.id === updated.id ? updated : t,
+      );
+      return { ...prev, myTasks, recentActivity };
+    });
+    setSelectedTask(updated);
+  };
+
   return (
     <div className="px-4 sm:px-6 py-5 sm:py-6 max-w-7xl mx-auto space-y-5 sm:space-y-6">
       <div>
@@ -121,25 +142,34 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-2">
               {stats?.myTasks?.map((task) => (
-                <div
+                <button
                   key={task.id}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
+                  onClick={() => setSelectedTask(task)}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 w-full min-w-0"
                 >
-                  <PriorityBadge priority={task.priority} />
-                  <span className="text-sm font-medium text-gray-800 flex-1 truncate">
+                  <div className="flex-shrink-0">
+                    <PriorityBadge priority={task.priority} />
+                  </div>
+
+                  <span className="text-sm font-medium text-gray-800 flex-1 truncate min-w-0 text-left">
                     {task.title}
                   </span>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+
+                  <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
                     <StatusBadge status={task.status} />
                     {task.due_date && (
                       <span
-                        className={`text-xs ${isOverdue(task.due_date) ? "text-red-600 font-semibold" : "text-gray-400"}`}
+                        className={`text-xs whitespace-nowrap ${
+                          isOverdue(task.due_date)
+                            ? "text-red-600 font-semibold"
+                            : "text-gray-400"
+                        }`}
                       >
                         {formatDate(task.due_date)}
                       </span>
                     )}
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}
@@ -186,6 +216,15 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Task Drawer */}
+      {selectedTask && (
+        <TaskDrawer
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+          onUpdated={handleTaskUpdated}
+        />
+      )}
     </div>
   );
 }

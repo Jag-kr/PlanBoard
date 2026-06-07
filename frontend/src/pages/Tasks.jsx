@@ -494,14 +494,6 @@ export default function Tasks() {
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
           onUpdated={handleTaskUpdated}
-          onDelete={
-            canManage
-              ? (id) => {
-                  setDeleteTarget({ id });
-                  setSelectedTask(null);
-                }
-              : undefined
-          }
         />
       )}
 

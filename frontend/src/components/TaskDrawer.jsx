@@ -42,11 +42,12 @@ export default function TaskDrawer({ task, onClose, onUpdated }) {
   }, [task]);
 
   useEffect(() => {
-    if (!activeWorkspace) return;
+    if (!activeWorkspace || !task) return;
     getMembers(activeWorkspace.id)
       .then((res) => setMembers(res.data.members || []))
       .catch(() => {});
-  }, [activeWorkspace]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task?.id, activeWorkspace?.id]);
 
   if (!task) return null;
 
