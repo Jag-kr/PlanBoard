@@ -152,14 +152,14 @@ backend/
 | PATCH  | `/api/projects/:id`                | ✅   | MANAGER+        |
 | DELETE | `/api/projects/:id`                | ✅   | MANAGER+        |
 | GET    | `/api/projects/:id/tasks`          | ✅   | member          |
-| POST   | `/api/projects/:id/tasks`          | ✅   | member          |
+| POST   | `/api/projects/:id/tasks`          | ✅   | MANAGER+        |
 | PATCH  | `/api/tasks/:id`                   | ✅   | member\*        |
 | DELETE | `/api/tasks/:id`                   | ✅   | MANAGER+        |
 | GET    | `/api/tasks/:id/comments`          | ✅   | member          |
-| POST   | `/api/tasks/:id/comments`          | ✅   | member          |
+| POST   | `/api/tasks/:id/comments`          | ✅   | member\*        |
 | DELETE | `/api/comments/:id`                | ✅   | author/MANAGER+ |
 
-> \* Members can only update tasks they created. MANAGER/ADMIN can update any task.
+> \* Members can only update or comment on tasks assigned to them. MANAGER/ADMIN can update or comment on any task.
 
 ---
 

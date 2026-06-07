@@ -227,13 +227,14 @@ Full interactive docs at `/api/docs` (Swagger UI).
 | PATCH  | `/api/projects/:id`                   | JWT  | MANAGER  |
 | DELETE | `/api/projects/:id`                   | JWT  | MANAGER  |
 | GET    | `/api/projects/:id/tasks`             | JWT  | MEMBER   |
-| POST   | `/api/projects/:id/tasks`             | JWT  | MEMBER   |
-| PATCH  | `/api/tasks/:id`                      | JWT  | MEMBER   |
+| POST   | `/api/projects/:id/tasks`             | JWT  | MANAGER  |
+| PATCH  | `/api/tasks/:id`                      | JWT  | MEMBER*  |
 | DELETE | `/api/tasks/:id`                      | JWT  | MANAGER  |
 | GET    | `/api/tasks/:id/comments`             | JWT  | MEMBER   |
-| POST   | `/api/tasks/:id/comments`             | JWT  | MEMBER   |
+| POST   | `/api/tasks/:id/comments`             | JWT  | MEMBER*  |
 | DELETE | `/api/comments/:id`                   | JWT  | MEMBER\* |
 
+* Members can only update or comment on tasks assigned to them.
 \* Own comments only; MANAGER+ can delete any.
 
 ---
@@ -242,7 +243,7 @@ Full interactive docs at `/api/docs` (Swagger UI).
 
 - 🔐 **Auth** — JWT signup / login, email-based workspace invitations
 - 🏢 **Multi-workspace** — create and switch between workspaces
-- 👥 **RBAC** — ADMIN / MANAGER / MEMBER with enforced permissions on every endpoint
+- 👥 **RBAC** — ADMIN / MANAGER / MEMBER with enforced permissions on every endpoint; members can only edit/comment tasks assigned to them
 - 📋 **Kanban board** — 4 columns: Todo → In Progress → In Review → Done
 - 🖱️ **Drag & Drop** — HTML5 Drag API, no external libraries
 - 💬 **Comments** — live comment threads with Ctrl+Enter to post
@@ -260,7 +261,9 @@ Full interactive docs at `/api/docs` (Swagger UI).
 | Workspace settings       |  ✅   |   ❌    |   ❌   |
 | Invite / remove members  |  ✅   |   ✅    |   ❌   |
 | Create / delete projects |  ✅   |   ✅    |   ❌   |
-| Create / assign tasks    |  ✅   |   ✅    |   ✅   |
+| Create / assign tasks    |  ✅   |   ✅    |   ❌   |
 | Delete any task          |  ✅   |   ✅    |   ❌   |
-| Comment on tasks         |  ✅   |   ✅    |   ✅   |
+| Comment on tasks         |  ✅   |   ✅    |   ✅*  |
 | Delete own comments      |  ✅   |   ✅    |   ✅   |
+
+* Members can only edit or comment on tasks assigned to them.
