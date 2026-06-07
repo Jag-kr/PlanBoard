@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { isLoggedIn } from "./utils/auth";
 import { getActiveWorkspace, fetchAndCacheWorkspaces } from "./utils/workspace";
 import ProtectedRoute from "./components/ProtectedRoute";
