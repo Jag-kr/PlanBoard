@@ -1,6 +1,6 @@
 # PlanBoard
 
-**Multi-Tenant SaaS Project Management Platform** — Jira-inspired Kanban board with real-time collaboration, workspace RBAC, and live comment threads.
+**Multi-Tenant SaaS Project Management Platform** — Task management with workspace RBAC, real-time collaboration, and live comment threads.
 
 | Layer    | Technology                                      |
 | -------- | ----------------------------------------------- |
@@ -22,9 +22,9 @@ PlanBoard/
 │   │   └── _redirects      # Render SPA fallback rule
 │   ├── src/
 │   │   ├── api/            # Axios modules per resource
-│   │   ├── components/     # Navbar, KanbanBoard, TaskDrawer, etc.
+│   │   ├── components/     # Navbar, TaskDrawer, Modal, etc.
 │   │   ├── context/        # AuthContext, WorkspaceContext
-│   │   ├── pages/          # Login, Signup, Dashboard, Board, …
+│   │   ├── pages/          # Login, Signup, Dashboard, Projects, Tasks, Members, …
 │   │   └── utils/          # helpers, toast, constants
 │   ├── .env.example
 │   └── vite.config.js
@@ -161,10 +161,11 @@ npm run dev
 - 🔐 **Auth** — JWT signup / login, email-based workspace invitations
 - 🏢 **Multi-workspace** — create and switch between workspaces
 - 👥 **RBAC** — ADMIN / MANAGER / MEMBER with enforced permissions on every endpoint; members can only edit/comment tasks assigned to them
-- 📋 **Kanban board** — 4 columns: Todo → In Progress → In Review → Done
-- 🖱️ **Drag & Drop** — HTML5 Drag API, no external libraries
-- 💬 **Comments** — live comment threads with Ctrl+Enter to post
-- 📊 **Dashboard** — stat cards, My Tasks, Recent Activity feed
+- 📋 **Task Management** — create, filter, sort, and manage tasks with priority and status tracking
+- 💬 **Comments** — live comment threads on tasks with Ctrl+Enter to post
+- 📊 **Dashboard** — overview stats, My Tasks list, and recent activity
+- 👁️ **Projects** — organize tasks by projects with status tracking
+- 👥 **Members** — team collaboration with role-based access control
 - 📧 **Invitations** — styled HTML email invites via Nodemailer + Gmail
 - 🏥 **Health check** — `GET /health` for uptime monitoring
 
